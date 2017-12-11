@@ -1,0 +1,49 @@
+[data]
+#data_root = [/home/wenqili/BRATS/Brats17TrainingData_crop_renamed]
+data_root = [/home/wenqili/BRATS/train]
+modality_postfix = [Flair,T1, T1c, T2]
+label_postfix = Label
+file_post_fix = nii.gz
+# stores prefix of volumes, e.g. HGG/HGG1_
+# if empty, load all the images in data_root
+data_names = 
+# only data_num images loaded, all images if data_num is None
+data_num =  
+batch_size = 5
+data_shape =  [19, 144, 144]
+label_shape = [11, 144, 144]
+label_convert_source = [0, 1, 2, 4]
+label_convert_target = [0, 1, 1, 1]
+batch_sample_model = [full, valid, valid]
+with_ground_truth = True
+batch_slice_direction = axial
+train_with_roi_patch = False
+roi_patch_margin = 
+
+
+[network]
+net_type = MSNet
+net_name = MSNet_WT32
+base_feature_number = [32, 32, 32, 32]
+acti_func = prelu
+downsample_twice = True
+data_shape = [19, 144, 144]
+label_shape = [11, 144, 144]
+# equal to length of modality_postfix
+data_channel = 4 
+class_num = 2
+
+[training]
+learning_rate = 1e-3
+decay = 1e-9
+random_seed = 1
+maximal_iteration = 20000
+start_iteration = 0
+test_iteration = 100
+test_step = 10
+snapshot_iteration = 5000
+model_pre_trained = 
+model_save_prefix = /home/guotwang/tf_project/tf_brats/model/msnet_wt32
+
+[testing]
+test_slice_direction = all
