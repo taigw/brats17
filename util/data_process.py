@@ -2,6 +2,7 @@ import os
 import nibabel
 import numpy as np
 import random
+from scipy import ndimage
 
 
 def get_roi_size(inputVolume):
@@ -10,6 +11,50 @@ def get_roi_size(inputVolume):
     minh = h_idxes.min(); maxh = h_idxes.max()
     minw = w_idxes.min(); maxw = w_idxes.max()
     return [maxd - mind, maxh - minh, maxw - minw]
+
+def get_roi(temp_label, margin):
+    [d_idxes, h_idxes, w_idxes] = np.nonzero(temp_label)
+    [D, H, W] = temp_label.shape
+    mind = max(d_idxes.min() - margin, 0)
+    maxd = min(d_idxes.max() + margin, D)
+    minh = max(h_idxes.min() - margin, 0)
+    maxh = min(h_idxes.max() + margin, H)
+    minw = max(w_idxes.min() - margin, 0)
+    maxw = min(w_idxes.max() + margin, W)   
+    return [mind, maxd, minh, maxh, minw, maxw]
+
+def get_largest_two_component(img, prt = False, threshold = None):
+    s = ndimage.generate_binary_structure(3,2) # iterate structure
+    labeled_array, numpatches = ndimage.label(img,s) # labeling
+    sizes = ndimage.sum(img,labeled_array,range(1,numpatches+1)) 
+    sizes_list = [sizes[i] for i in range(len(sizes))]
+    sizes_list.sort()
+    if(prt):
+        print('component size', sizes_list)
+    if(len(sizes) == 1):
+        return img
+    else:
+        if(threshold):
+            out_img = np.zeros_like(img)
+            for temp_size in sizes_list:
+                if(temp_size > threshold):
+                    temp_lab = np.where(sizes == temp_size)[0] + 1
+                    temp_cmp = labeled_array == temp_lab
+                    out_img = (out_img + temp_cmp) > 0
+            return out_img
+        else:    
+            max_size1 = sizes_list[-1]
+            max_size2 = sizes_list[-2]
+            max_label1 = np.where(sizes == max_size1)[0] + 1
+            max_label2 = np.where(sizes == max_size2)[0] + 1
+            component1 = labeled_array == max_label1
+            component2 = labeled_array == max_label2
+            if(prt):
+                print(max_size2, max_size1, max_size2/max_size1)   
+            if(max_size2*10 > max_size1):
+                component1 = (component1 + component2) > 0
+            
+            return component1
 
 def get_unique_image_name(img_name_list, subname):
     img_name = [x for x in img_name_list if subname in x]
@@ -29,6 +74,34 @@ def load_all_modalities_in_one_folder(patient_dir):
         img   = load_nifty_volume_as_array(os.path.join(patient_dir, img_name))
         img_list.append(img)
     return img_list
+
+def fill_holes(img): 
+    neg = 1 - img
+    s = ndimage.generate_binary_structure(3,1) # iterate structure
+    labeled_array, numpatches = ndimage.label(neg,s) # labeling
+    sizes = ndimage.sum(neg,labeled_array,range(1,numpatches+1)) 
+    sizes_list = [sizes[i] for i in range(len(sizes))]
+    sizes_list.sort()
+    max_size = sizes_list[-1]
+    max_label = np.where(sizes == max_size)[0] + 1
+    component = labeled_array == max_label
+    return 1 - component
+
+def remove_external_core(lab_main, lab_ext):
+    # for each component of lab_ext, compute the overlap with lab_main
+    s = ndimage.generate_binary_structure(3,2) # iterate structure
+    labeled_array, numpatches = ndimage.label(lab_ext,s) # labeling
+    sizes = ndimage.sum(lab_ext,labeled_array,range(1,numpatches+1)) 
+    sizes_list = [sizes[i] for i in range(len(sizes))]
+    new_lab_ext = np.zeros_like(lab_ext)
+    for i in range(len(sizes)):
+        sizei = sizes_list[i]
+        labeli =  np.where(sizes == sizei)[0] + 1
+        componenti = labeled_array == labeli
+        overlap = componenti * lab_main
+        if((overlap.sum()+ 0.0)/sizei >= 0.5):
+            new_lab_ext = np.maximum(new_lab_ext, componenti)
+    return new_lab_ext
 
 def get_itensity_statistics(volume, n_pxl, iten_sum, iten_sq_sum):
     volume = np.asanyarray(volume, np.float32)

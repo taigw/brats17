@@ -6,86 +6,13 @@ from scipy import ndimage
 import time
 import os
 import sys
-from data_io.data_loader import *
-from run_train import NetFactory
+from util.data_loader import *
+from util.data_process import *
 from util.train_test_func import *
 from util.parse_config import parse_config
-import pickle
+from train import NetFactory
 
- 
-def get_roi(temp_label, margin):
-    [d_idxes, h_idxes, w_idxes] = np.nonzero(temp_label)
-    [D, H, W] = temp_label.shape
-    mind = max(d_idxes.min() - margin, 0)
-    maxd = min(d_idxes.max() + margin, D)
-    minh = max(h_idxes.min() - margin, 0)
-    maxh = min(h_idxes.max() + margin, H)
-    minw = max(w_idxes.min() - margin, 0)
-    maxw = min(w_idxes.max() + margin, W)   
-    return [mind, maxd, minh, maxh, minw, maxw]
-
-def get_largest_two_component(img, prt = False, threshold = None):
-    s = ndimage.generate_binary_structure(3,2) # iterate structure
-    labeled_array, numpatches = ndimage.label(img,s) # labeling
-    sizes = ndimage.sum(img,labeled_array,range(1,numpatches+1)) 
-    sizes_list = [sizes[i] for i in range(len(sizes))]
-    sizes_list.sort()
-    if(prt):
-        print('component size', sizes_list)
-    if(len(sizes) == 1):
-        return img
-    else:
-        if(threshold):
-            out_img = np.zeros_like(img)
-            for temp_size in sizes_list:
-                if(temp_size > threshold):
-                    temp_lab = np.where(sizes == temp_size)[0] + 1
-                    temp_cmp = labeled_array == temp_lab
-                    out_img = (out_img + temp_cmp) > 0
-            return out_img
-        else:    
-            max_size1 = sizes_list[-1]
-            max_size2 = sizes_list[-2]
-            max_label1 = np.where(sizes == max_size1)[0] + 1
-            max_label2 = np.where(sizes == max_size2)[0] + 1
-            component1 = labeled_array == max_label1
-            component2 = labeled_array == max_label2
-            if(prt):
-                print(max_size2, max_size1, max_size2/max_size1)   
-            if(max_size2*10 > max_size1):
-                component1 = (component1 + component2) > 0
-            
-            return component1
-
-def fill_holes(img): 
-    neg = 1 - img
-    s = ndimage.generate_binary_structure(3,1) # iterate structure
-    labeled_array, numpatches = ndimage.label(neg,s) # labeling
-    sizes = ndimage.sum(neg,labeled_array,range(1,numpatches+1)) 
-    sizes_list = [sizes[i] for i in range(len(sizes))]
-    sizes_list.sort()
-    max_size = sizes_list[-1]
-    max_label = np.where(sizes == max_size)[0] + 1
-    component = labeled_array == max_label
-    return 1 - component
-
-def remove_external_core(lab_main, lab_ext):
-    # for each component of lab_ext, compute the overlap with lab_main
-    s = ndimage.generate_binary_structure(3,2) # iterate structure
-    labeled_array, numpatches = ndimage.label(lab_ext,s) # labeling
-    sizes = ndimage.sum(lab_ext,labeled_array,range(1,numpatches+1)) 
-    sizes_list = [sizes[i] for i in range(len(sizes))]
-    new_lab_ext = np.zeros_like(lab_ext)
-    for i in range(len(sizes)):
-        sizei = sizes_list[i]
-        labeli =  np.where(sizes == sizei)[0] + 1
-        componenti = labeled_array == labeli
-        overlap = componenti * lab_main
-        if((overlap.sum()+ 0.0)/sizei >= 0.5):
-            new_lab_ext = np.maximum(new_lab_ext, componenti)
-    return new_lab_ext
-
-def run(config_file):
+def test(config_file):
     # construct graph
     config = parse_config(config_file)
     config_data = config['data']
@@ -321,41 +248,14 @@ def run(config_file):
         saver1 = tf.train.Saver(net1_vars)
         saver1.restore(sess, config_net1['model_file'])
     else:
-#        net1ax_vars = [x for x in all_vars if x.name[0:len(net_name1ax)+1]==net_name1ax + '/']
-#        saver1ax = tf.train.Saver(net1ax_vars)
-#
-#        saver1ax.restore(sess, config_net1sg['model_file'])
-#        net1sg_vars = [x for x in all_vars if x.name[0:len(net_name1sg)+1]==net_name1sg + '/']
-#        for i in range(len(net1sg_vars)):
-#            copy_value = tf.assign(net1sg_vars[i], net1ax_vars[i])
-#            copy_value.eval()
-#        print('net1sg loaded')
-#        saver1sg = tf.train.Saver(net1sg_vars)
-#        saver1sg.save(sess, "model/msnet_wt32sg_20000cp.ckpt")
-#        print('netsg saved')
-#
-#        saver1ax.restore(sess, config_net1cr['model_file'])
-#        net1cr_vars = [x for x in all_vars if x.name[0:len(net_name1cr)+1]==net_name1cr + '/']
-#        for i in range(len(net1cr_vars)):
-#            copy_value = tf.assign(net1cr_vars[i], net1ax_vars[i])
-#            copy_value.eval()
-#        saver1cr = tf.train.Saver(net1cr_vars)
-#        saver1cr.save(sess, "model/msnet_wt32cr_20000cp.ckpt")
-#        print('net1cr saved')
-#
-#        saver1ax.restore(sess, config_net1ax['model_file'])
-
         net1ax_vars = [x for x in all_vars if x.name[0:len(net_name1ax) + 1]==net_name1ax + '/']
         saver1ax = tf.train.Saver(net1ax_vars)
-        print('net1ax', len(net1ax_vars))
         saver1ax.restore(sess, config_net1ax['model_file'])
         net1sg_vars = [x for x in all_vars if x.name[0:len(net_name1sg) + 1]==net_name1sg + '/']
-        print('net1sg', len(net1sg_vars))
         saver1sg = tf.train.Saver(net1sg_vars)
         saver1sg.restore(sess, config_net1sg['model_file'])     
         net1cr_vars = [x for x in all_vars if x.name[0:len(net_name1cr) + 1]==net_name1cr + '/']
         saver1cr = tf.train.Saver(net1cr_vars)
-        print('net1cr', len(net1cr_vars))
         saver1cr.restore(sess, config_net1cr['model_file'])
 
     if(config_net2):
@@ -557,10 +457,10 @@ def run(config_file):
 if __name__ == '__main__':
     if(len(sys.argv) != 2):
         print('Number of arguments should be 2. e.g.')
-        print('    python run_test.py config.txt')
+        print('    python test.py config.txt')
         exit()
     config_file = str(sys.argv[1])
     assert(os.path.isfile(config_file))
-    run(config_file)
+    test(config_file)
     
     

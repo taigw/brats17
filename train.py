@@ -9,11 +9,12 @@ import os
 import sys
 import tensorflow as tf
 from tensorflow.contrib.layers.python.layers import regularizers
+from niftynet.layer.loss_segmentation import LossFunction
 from util.data_loader import *
 from util.train_test_func import *
 from util.parse_config import parse_config
 from util.MSNet import MSNet
-from niftynet.layer.loss_segmentation import LossFunction
+
 
 import pickle
 class NetFactory(object):
