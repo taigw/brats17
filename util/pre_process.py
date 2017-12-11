@@ -76,35 +76,7 @@ def get_roi_from_volumes(volumes):
         print(roi_volume.shape)
     return roi_volumes, [mind, maxd, minh, maxh, minw, maxw]
 
-def get_training_set_statistics(): 
-    source_root = '/Users/guotaiwang/Documents/data/BRATS2017/BRATS17TrainingData/'
-    all_patients_list = get_all_patients_dir(source_root)
 
-    # get itensity mean and std
-#     n_pxls = np.zeros([4], np.float32)
-#     iten_sum = np.zeros([4], np.float32)
-#     iten_sq_sum = np.zeros([4], np.float32)
-#     for patient_dir in all_patients_list:
-#         volumes = load_all_modalities_in_one_folder(patient_dir)
-#         for i in range(4):
-#             n_pxls[i], iten_sum[i], iten_sq_sum[i] = get_itensity_statistics(
-#                     volumes[i], n_pxls[i], iten_sum[i], iten_sq_sum[i])
-#         print patient_dir
-#         print volumes[0][volumes[0]>0].mean(), volumes[1][volumes[1]>0].mean(), volumes[2][volumes[2]>0].mean(), volumes[3][volumes[3]>0].mean()
-#     mean = np.divide(iten_sum, n_pxls)
-#     sq_men = np.divide(iten_sq_sum, n_pxls)
-#     std = np.sqrt(sq_men - np.square(mean))
-#     print mean, std    
-   
-    roi_size = []
-    for patient_dir in all_patients_list:
-        volumes = load_all_modalities_in_one_folder(patient_dir)
-        for i in range(4):
-            roi = get_roi_size(volumes[i])
-            roi_size.append(roi)
-    roi_size = np.asarray(roi_size)
-    print(roi_size.mean(axis = 0), roi_size.std(axis = 0))
-        
 def extract_roi_for_training_set():
     source_root = '/Users/guotaiwang/Documents/data/BRATS2017/BRATS17TrainingData/'
     target_root = 'Training_extract'

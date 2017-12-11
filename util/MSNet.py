@@ -10,6 +10,11 @@ from niftynet.layer.deconvolution import DeconvolutionalLayer
 from niftynet.layer.elementwise import ElementwiseLayer
 
 class MSNet(TrainableLayer):
+    """
+    Inplementation of WNet, TNet and ENet presented in:
+        Wang, Guotai, Wenqi Li, Sebastien Ourselin, and Tom Vercauteren. "Automatic brain tumor segmentation using cascaded anisotropic convolutional neural networks." arXiv preprint arXiv:1709.00382 (2017).
+    These three variants are implemented in a single class named as "MSNet".
+    """
     def __init__(self,
                  num_classes,
                  w_initializer=None,

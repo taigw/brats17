@@ -2,7 +2,7 @@
 from __future__ import absolute_import, print_function
 import tensorflow as tf
 import numpy as np
-from data_io.data_loader import \
+from util.data_loader import \
     extract_roi_from_volume, transpose_volumes, convert_label
 
 

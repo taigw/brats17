@@ -9,6 +9,14 @@ import random
 from scipy import ndimage
 
 def search_file_in_folder_list(folder_list, file_name):
+    """
+    Find the full filename from a list of folders
+    inputs:
+        folder_list: a list of folders
+        file_name:  filename
+    outputs:
+        full_file_name: the full filename
+    """
     file_exist = False
     for folder in folder_list:
         full_file_name = os.path.join(folder, file_name)
@@ -20,21 +28,40 @@ def search_file_in_folder_list(folder_list, file_name):
     return full_file_name
 
 def load_nifty_volume_as_array(filename):
-    # input shape [W, H, D]
-    # output shape [D, H, W]
+    """
+    load nifty image into numpy array, and transpose it based on the [z,y,x] axis order
+    The output array shape is like [Depth, Height, Width]
+    inputs:
+        filename: the input file name, should be *.nii or *.nii.gz
+    outputs:
+        data: a numpy data array
+    """
     img = nibabel.load(filename)
     data = img.get_data()
     data = np.transpose(data, [2,1,0])
     return data
 
 def save_array_as_nifty_volume(data, filename):
-    # numpy data shape [D, H, W]
-    # nifty image shape [W, H, W]
+    """
+    save a numpy array as nifty image
+    inputs:
+        data: a numpy array with shape [Depth, Height, Width]
+        filename: the ouput file name
+    outputs: None
+    """
     data = np.transpose(data, [2, 1, 0])
     img = nibabel.Nifti1Image(data, np.eye(4))
     nibabel.save(img, filename)
 
 def itensity_normalize_one_volume(volume):
+    """
+    normalize the itensity of an nd volume based on the mean and std of nonzeor region
+    inputs:
+        volume: the input nd volume
+    outputs:
+        out: the normalized nd volume
+    """
+    
     pixels = volume[volume > 0]
     mean = pixels.mean()
     std  = pixels.std()
@@ -44,6 +71,15 @@ def itensity_normalize_one_volume(volume):
     return out
 
 def convert_label(in_volume, label_convert_source, label_convert_target):
+    """
+    convert the label value in a volume
+    inputs:
+        in_volume: input nd volume with label set label_convert_source
+        label_convert_source: a list of integers denoting input labels, e.g., [0, 1, 2, 4]
+        label_convert_target: a list of integers denoting output labels, e.g.,[0, 1, 2, 3]
+    outputs:
+        out_volume: the output nd volume with label set label_convert_target
+    """
     mask_volume = np.zeros_like(in_volume)
     convert_volume = np.zeros_like(in_volume)
     for i in range(len(label_convert_source)):
@@ -59,6 +95,17 @@ def convert_label(in_volume, label_convert_source, label_convert_target):
     return out_volume
         
 def get_random_roi_sampling_center(input_shape, output_shape, sample_mode, bounding_box = None):
+    """
+    get a random coordinate representing the center of a roi for sampling
+    inputs:
+        input_shape: the shape of sampled volume
+        output_shape: the desired roi shape
+        sample_mode: 'full': the entire roi should be inside the input volume
+                     'valid': only the roi centre should be inside the input volume
+        bounding_box: the bounding box which the roi center should be limited to
+    outputs:
+        center: the output center coordinate of a roi
+    """
     center = []
     for i in range(len(input_shape)):
         if(sample_mode[i] == 'full'):
@@ -81,6 +128,14 @@ def get_random_roi_sampling_center(input_shape, output_shape, sample_mode, bound
     return center    
 
 def transpose_volumes(volumes, slice_direction):
+    """
+    transpose a list of volumes
+    inputs:
+        volumes: a list of nd volumes
+        slice_direction: 'axial', 'sagittal', or 'coronal'
+    outputs:
+        tr_volumes: a list of transposed volumes
+    """
     if (slice_direction == 'axial'):
         tr_volumes = volumes
     elif(slice_direction == 'sagittal'):
@@ -92,20 +147,34 @@ def transpose_volumes(volumes, slice_direction):
         tr_volumes = volumes
     return tr_volumes
 
-def resize_3D_volume_to_given_shape(volume, out_shape, order = 3):  
-    shape0=volume.shape
-    scale_d=(out_shape[0]+0.0)/shape0[0]
-    scale_h=(out_shape[1]+0.0)/shape0[1]
-    scale_w=(out_shape[2]+0.0)/shape0[2]
-    return ndimage.interpolation.zoom(volume,[scale_d,scale_h,scale_w], order = order)   
-                                                    
-def resize_ND_volume_to_given_shape(volume, out_shape, order = 3):  
+
+def resize_ND_volume_to_given_shape(volume, out_shape, order = 3):
+    """
+    resize an nd volume to a given shape
+    inputs:
+        volume: the input nd volume, an nd array
+        out_shape: the desired output shape, a list
+        order: the order of interpolation
+    outputs:
+        out_volume: the reized nd volume with given shape
+    """
     shape0=volume.shape
     assert(len(shape0) == len(out_shape))
     scale = [(out_shape[i] + 0.0)/shape0[i] for i in range(len(shape0))]
-    return ndimage.interpolation.zoom(volume, scale, order = order) 
+    out_volume = ndimage.interpolation.zoom(volume, scale, order = order)
+    return out_volume
 
 def extract_roi_from_volume(volume, in_center, output_shape, fill = 'random'):
+    """
+    extract a roi from a 3d volume
+    inputs:
+        volume: the input 3D volume
+        in_center: the center of the roi
+        output_shape: the size of the roi
+        fill: 'random' or 'zero', the mode to fill roi region where is outside of the input volume
+    outputs:
+        output: the roi volume
+    """
     input_shape = volume.shape   
     if(fill == 'random'):
         output = np.random.normal(0, 1, size = output_shape)
@@ -125,16 +194,6 @@ def extract_roi_from_volume(volume, in_center, output_shape, fill = 'random'):
                       range(in_center[2] - r0[2], in_center[2] + r1[2]))]
     return output
 
-def interaction_distance_processing(volume_list):
-    # [img, seg, fg_dis, bg_dis]
-    assert(len(volume_list) == 4)
-    rand_img = np.random.normal(0.0, 1.0, size = volume_list[0].shape)
-    img = volume_list[0]
-    img[volume_list[2] < 1] = rand_img[volume_list[2] < 1] 
-    img[volume_list[3] < 1] = rand_img[volume_list[3] < 1] 
-    output_list  = [img, volume_list[1], volume_list[2], volume_list[3]]
-    return output_list
-
 class DataLoader():
     def __init__(self):
         pass
@@ -149,9 +208,6 @@ class DataLoader():
         self.data_names = config['data_names']
         self.data_num = config.get('data_num', 0)
         self.data_resize = config.get('data_resize', None)
-        self.with_probability = config.get('with_probability', False)
-        self.use_distance_mask = config.get('use_distance_mask', False)
-        self.prob_postfix     = config.get('prob_postfix', None)
         self.with_ground_truth  = config.get('with_ground_truth', False)
         self.with_flip = config.get('with_flip', False)
         self.label_convert_source = self.config.get('label_convert_source', None)
@@ -162,6 +218,10 @@ class DataLoader():
             self.intensity_normalize = [True] * len(self.modality_postfix)
             
     def __get_patient_names(self):
+        """
+        get the list of patient names, if self.data_names id not None, then load patient 
+        names from that file, otherwise get search all the names automatically in data_root
+        """
         if(self.data_names):
             assert(os.path.isfile(self.data_names))
             with open(self.data_names) as f:
@@ -194,6 +254,9 @@ class DataLoader():
         return patient_names
     
     def load_data(self):
+        """
+        load all the training/testing data
+        """
         self.patient_names = self.__get_patient_names()
         X = []
         W = []
@@ -214,8 +277,6 @@ class DataLoader():
                 if(self.intensity_normalize[mod_idx]):
                     volume = itensity_normalize_one_volume(volume)
                 volume_list.append(volume)
-            if(self.use_distance_mask):
-                volume_list = interaction_distance_processing(volume_list)
             X.append(volume_list)
             W.append(weight)
             if(self.with_ground_truth):
@@ -225,25 +286,16 @@ class DataLoader():
                 if(self.data_resize):
                     label = resize_3D_volume_to_given_shape(label, self.data_resize, 0)
                 Y.append(label)
-            if(self.with_probability):
-                prob_name_short = self.patient_names[i] + '_' + self.prob_postfix + '.' + self.file_postfix
-                prob_name = search_file_in_folder_list(self.data_root, prob_name_short)
-                prob = load_nifty_volume_as_array(prob_name)
-                if(self.data_resize):
-                    prob = resize_3D_volume_to_given_shape(prob, self.data_resize, 1)
-                P.append(prob)
                 
         print('{0:} volumes have been loaded'.format(len(X)))
         self.data   = X
         self.weight = W
         self.label  = Y
-        self.prob   = P
-    
     
     def get_subimage_batch(self):
-        '''
+        """
         sample a batch of image patches for segmentation. Only used for training
-        '''
+        """
         flag = False
         while(flag == False):
             batch = self.__get_one_batch()
@@ -253,6 +305,9 @@ class DataLoader():
         return batch
     
     def __get_one_batch(self):
+        """
+        get a batch from training data
+        """
         batch_size = self.config['batch_size']
         data_shape = self.config['data_shape']
         label_shape = self.config['label_shape']
@@ -285,8 +340,6 @@ class DataLoader():
             self.patient_id = random.randint(0, len(self.data)-1)
             data_volumes = [x for x in self.data[self.patient_id]]
             weight_volumes = [self.weight[self.patient_id]]
-            if(self.with_probability):
-                prob_volumes = [self.prob[self.patient_id]]
             boundingbox = None
             if(self.with_ground_truth):
                 label_volumes = [self.label[self.patient_id]]
@@ -317,12 +370,7 @@ class DataLoader():
                             label_volumes[idx] = label_volumes[idx][np.ix_(range(mind, maxd), 
                                                                      range(minh, maxh), 
                                                                      range(minw, maxw))]
-                        if(self.with_probability):
-                            for idx in range(len(prob_volumes)):
-                                prob_volumes[idx] = prob_volumes[idx][np.ix_(range(mind, maxd), 
-                                                                         range(minh, maxh), 
-                                                                         range(minw, maxw))] 
-                                                    
+
                 if(self.label_convert_source and self.label_convert_target):
                     label_volumes[0] = convert_label(label_volumes[0], self.label_convert_source, self.label_convert_target)
         
@@ -363,17 +411,7 @@ class DataLoader():
                 if(down_sample_rate != 1.0):
                     sub_label = ndimage.interpolation.zoom(sub_label, 1.0/down_sample_rate, order = 0)  
                 label_batch.append([sub_label])
-            if(self.with_probability):
-                tranposed_prob = transpose_volumes(prob_volumes, slice_direction)
-                sub_prob = extract_roi_from_volume(tranposed_prob[0],
-                                                     center_point,
-                                                     sub_data_shape,
-                                                     fill = 'zero')
-                if(flip):
-                    sub_prob = np.flip(sub_prob, -1)
-                if(down_sample_rate != 1.0):
-                    sub_prob = ndimage.interpolation.zoom(sub_prob, 1.0/down_sample_rate, order = 0)  
-                prob_batch.append([sub_prob])                
+                    
         data_batch = np.asarray(data_batch, np.float32)
         weight_batch = np.asarray(weight_batch, np.float32)
         label_batch = np.asarray(label_batch, np.int64)
@@ -382,37 +420,12 @@ class DataLoader():
         batch['images']  = np.transpose(data_batch, [0, 2, 3, 4, 1])
         batch['weights'] = np.transpose(weight_batch, [0, 2, 3, 4, 1])
         batch['labels']  = np.transpose(label_batch, [0, 2, 3, 4, 1])
-        if(self.with_probability):
-            batch['probs']   = np.transpose(prob_batch, [0, 2, 3, 4, 1])
-        else:
-            batch['probs']  = None
+        
         return batch
     
     # The following two functions are used for testing
     def get_total_image_number(self):
         return len(self.data)
     
-    def get_image_data_with_name(self, i, with_probability = False):
-        if(with_probability):
-            return [self.data[i], self.weight[i], self.prob[i], self.patient_names[i]]
-        else:
-            return [self.data[i], self.weight[i], self.patient_names[i]]
-    
-if __name__ == "__main__":
-    loader = BratsLoader()
-    loader.load_data("test")
-    random.seed(1)
-    batch = loader.get_subimage_batch()
-    data_batch = np.transpose(batch['images'],[0, 4, 1, 2, 3])
-    label_batch = np.asarray(np.transpose(batch['labels'],[0, 4, 1, 2, 3]), np.uint8)
-    weight_batch = np.transpose(batch['weights'],[0, 4, 1, 2, 3])
-     
-    save_folder = '/Users/guotaiwang/Documents/workspace/tf_project/tf_brats/data_process/temp_data'
-    for batch_idx in range(5):
-        for mod in range(4):     
-            save_name = os.path.join(save_folder, "batch_{0:}_{1:}.nii.gz".format(batch_idx, mod))
-            save_array_as_nifty_volume(data_batch[batch_idx][mod], save_name)
-        save_name = os.path.join(save_folder, "label_{0:}.nii.gz".format(batch_idx))
-        save_array_as_nifty_volume(label_batch[batch_idx][0], save_name)
-        save_name = os.path.join(save_folder, "weight_{0:}.nii.gz".format(batch_idx))
-        save_array_as_nifty_volume(weight_batch[batch_idx][0], save_name)
+    def get_image_data_with_name(self, i):
+        return [self.data[i], self.weight[i], self.patient_names[i]]
