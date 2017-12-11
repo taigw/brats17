@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function
-import tensorflow as tf
-from tensorflow.contrib.layers.python.layers import regularizers
+
 import numpy as np
 import random
 from scipy import ndimage
 import time
 import os
 import sys
-from data_io.data_loader import *
+import tensorflow as tf
+from tensorflow.contrib.layers.python.layers import regularizers
+from util.data_loader import *
 from util.train_test_func import *
 from util.parse_config import parse_config
-from net.MSNet import MSNet
-from niftynet.network.unet import UNet3D
-from niftynet.network.highres3dnet import HighRes3DNet
+from util.MSNet import MSNet
+
 from niftynet.layer.loss_segmentation import LossFunction
 
 import pickle
@@ -22,10 +22,6 @@ class NetFactory(object):
     def create(name):
         if name == 'MSNet':
             return MSNet
-        if name == 'HighRes3DNet':
-            return HighRes3DNet
-        if name == 'UNet3D':
-            return UNet3D
         print('unsupported network:', name)
         exit()
         
