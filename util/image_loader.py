@@ -26,12 +26,10 @@ class DataLoader(object):
         self.label_postfix = config.get('label_postfix', None)
         self.file_postfix  = config['file_post_fix']
         self.data_names    = config['data_names']
-        self.data_num      = config.get('data_num', 0)
         self.with_weight   = config.get('with_weight', True)
         self.weight_postfix= config.get('weight_postfix', None)
         self.weight_nonzero= config.get('weight_nonzero', True)
         self.with_flip     = config.get('with_flip', False)
-        self.batch_size    = config['batch_size']
         self.batch_slice_direction = config.get('batch_slice_direction', 'axial')
         self.train_with_roi_patch  = config.get('train_with_roi_patch', False)
         self.label_roi_mask        = config.get('label_roi_mask', None)
@@ -39,7 +37,6 @@ class DataLoader(object):
         self.label_convert_target  = config.get('label_convert_target', None)
         if(self.label_convert_source and self.label_convert_target):
             assert(len(self.label_convert_source) == len(self.label_convert_target))
-        self.__check_image_patch_shape()
 
     def __check_image_patch_shape(self):
         self.data_shape  = self.config['data_shape']
@@ -303,7 +300,16 @@ class DataLoader(object):
                 imgs.append(img[0])
             imgs = np.asarray(imgs)
             imgs = np.transpose(imgs, axes = [1, 2, 3, 0])
-            one_item = {'image': imgs, 'name':patient_names[i]}
+            one_item = {}
+            if(self.with_weight and self.weight_nonzero):
+                weight = np.asarray(imgs[:,:,:,0] > 0, np.float32)
+                weight = np.reshape(weight, list(weight.shape) + [1])
+                one_item['weight'] = tf.constant(weight, tf.float32)
+            imgs = tf.constant(imgs, tf.float32)
+            if(self.intensity_normalize):
+                imgs = itensity_normalize_4d_tensor_by_each_channel(imgs)
+            one_item['image']= imgs
+            one_item['name'] = patient_names[i]
             yield one_item
 
     def get_dataset(self, mode, shuffle = True):
@@ -316,6 +322,8 @@ class DataLoader(object):
             wht_names.append([full_patient_names[i]['weight']])
             lab_names.append([full_patient_names[i]['label']])
         if(mode == 'train' or mode == 'valid'):
+            self.__check_image_patch_shape()
+            self.batch_size = self.config['batch_size']
             dataset = {'image':tf.constant(img_names), 'label':tf.constant(lab_names)}
             if(self.with_weight and (self.weight_postfix is not None)):
                 dataset['weight'] = tf.constant(wht_names)

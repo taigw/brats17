@@ -73,7 +73,6 @@ def train(config_file):
     loader = DataLoader(config_data)
     train_data = loader.get_dataset('train', shuffle = True)
     batch_per_epoch = loader.get_batch_per_epoch()
-    print('batch per epoch', batch_per_epoch)
     train_iterator = Iterator.from_structure(train_data.output_types,
                                              train_data.output_shapes)
     next_train_batch = train_iterator.get_next()
@@ -97,7 +96,7 @@ def train(config_file):
         if((n+1)%config_train['loss_display_iteration'] == 0):
             avg_loss = np.asarray(temp_loss_list, np.float32).mean()
             t = time.strftime('%X %x %Z')
-            print(t, 'iter', n,'loss', avg_loss)
+            print(t, 'iter', n+1,'loss', avg_loss)
             loss_list.append(avg_loss)
             np.savetxt(loss_file, np.asarray(loss_list))
             temp_loss_list = []

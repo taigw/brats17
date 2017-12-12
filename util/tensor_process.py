@@ -203,8 +203,13 @@ def pad_tensor_to_desired_shape(inpt_tensor, outpt_shape, mode="REFLECT"):
     outpt_tensor = tf.pad(inpt_tensor, pad_lr, mode = mode)
     return outpt_tensor
 
-def itensity_normalize_4d_tensor_by_each_channel(input_tensor):
+def itensity_normalize_4d_tensor_by_each_channel(input_tensor, use_roi_statistics = True):
     inpt_shape = tf.shape(input_tensor)
-    mean, var = tf.nn.moments(input_tensor, axes=[0, 1, 2])
+    if(use_roi_statistics):
+        mean, var = tf.nn.moments(input_tensor, axes=[0, 1, 2])
+    else:
+        [idx_min, idx_max] = get_bounding_box_of_4d_tensor(input_tensor, margin=[0,0,0,0])
+        roi = crop_4d_tensor_with_bounding_box(input_tensor, idx_min, idx_max)
+        mean, var = tf.nn.moments(roi, axes=[0, 1, 2])
     new_tensor = tf.div(tf.subtract(input_tensor, mean), tf.sqrt(var))
     return new_tensor
