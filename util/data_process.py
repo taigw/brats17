@@ -4,6 +4,26 @@ import numpy as np
 import random
 from scipy import ndimage
 
+def search_file_in_folder_list(folder_list, file_name):
+    """
+    Find the full filename from a list of folders
+    inputs:
+        folder_list: a list of folders
+        file_name:  filename
+    outputs:
+        full_file_name: the full filename
+    """
+    file_exist = False
+    for folder in folder_list:
+        full_file_name = os.path.join(folder, file_name)
+        if(os.path.isfile(full_file_name)):
+            file_exist = True
+            break
+    if(file_exist == False):
+        raise ValueError('file not exist: {0:}'.format(file_name))
+    return full_file_name
+
+
 def get_roi(temp_label, margin):
     [d_idxes, h_idxes, w_idxes] = np.nonzero(temp_label)
     [D, H, W] = temp_label.shape
