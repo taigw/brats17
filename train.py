@@ -8,9 +8,10 @@ import time
 import os
 import sys
 import tensorflow as tf
+from tensorflow.contrib.data import Iterator
 from tensorflow.contrib.layers.python.layers import regularizers
 from niftynet.layer.loss_segmentation import LossFunction
-from util.data_loader import *
+from util.image_loader import *
 from util.train_test_func import *
 from util.parse_config import parse_config
 from util.MSNet import MSNet
@@ -26,12 +27,11 @@ class NetFactory(object):
         exit()
 
 def train(config_file):
-    # load configuration parameters
+    # 1, load configuration parameters
     config = parse_config(config_file)
     config_data  = config['data']
     config_net   = config['network']
     config_train = config['training']
-    config_test  = config['testing']  
      
     random.seed(config_train.get('random_seed', 1))
     assert(config_data['with_ground_truth'])
@@ -44,8 +44,7 @@ def train(config_file):
     class_num   = config_net['class_num']
     batch_size  = config_data.get('batch_size', 5)
    
-    # construct graph
-    print('data_channel',data_channel)
+    # 2, construct graph
     full_data_shape = [batch_size] + data_shape + [data_channel]
     full_label_shape = [batch_size] + label_shape + [1]
     x = tf.placeholder(tf.float32, shape = full_data_shape)
@@ -67,38 +66,37 @@ def train(config_file):
     loss = loss_func(predicty, y, weight_map = w)
     print('size of predicty:',predicty)
     
-    # Initialize session and saver
+    # 3, initialize session and saver
     lr = config_train.get('learning_rate', 1e-3)
     opt_step = tf.train.AdamOptimizer(lr).minimize(loss)
     sess = tf.InteractiveSession()   
     sess.run(tf.global_variables_initializer())  
     saver = tf.train.Saver()
     
-    loader = DataLoader()
-    loader.set_params(config_data)
-    loader.load_data()
-
-    loss_list = []
+    loader = DataLoader(config_data)
+    train_data = loader.get_dataset('train', shuffle = True)
+    batch_per_epoch = loader.get_batch_per_epoch()
+    train_iterator = Iterator.from_structure(train_data.output_types,
+                                             train_data.output_shapes)
+    next_train_batch = train_iterator.get_next()
+    train_init_op  = train_iterator.make_initializer(train_data)
+    
+    # 4, start to train
     loss_file = config_train['model_save_prefix'] + "_loss.txt"
     start_it = config_train.get('start_iteration', 0)
     if( start_it> 0):
         saver.restore(sess, config_train['model_pre_trained'])
+    batch_dice_list = []
     for n in range(start_it, config_train['maximal_iteration']):
-        train_pair = loader.get_subimage_batch()
-        tempx = train_pair['images']
-        tempw = train_pair['weights']
-        tempy = train_pair['labels']
-        opt_step.run(session = sess, feed_dict={x:tempx, w: tempw, y:tempy})
-          
-        if(n%config_train['test_iteration'] == 0):
-            batch_dice_list = []
-            for step in range(config_train['test_step']):
-                train_pair = loader.get_subimage_batch()
-                tempx = train_pair['images']
-                tempw = train_pair['weights']
-                tempy = train_pair['labels']
-                dice = loss.eval(feed_dict ={x:tempx, w:tempw, y:tempy})
-                batch_dice_list.append(dice)
+        if((n-start_it)%batch_per_epoch == 0):
+            sess.run(train_init_op)
+        one_batch = sess.run(next_train_batch)
+        feed_dict = {x:one_batch['image'], w:one_batch['weight'], y:one_batch['label']}
+        opt_step.run(session = sess, feed_dict=feed_dict)
+
+        if(n%config_train['loss_display_iteration'] == 0):
+            dice = loss.eval(feed_dict = feed_dict)
+            batch_dice_list.append(dice)
             batch_dice = np.asarray(batch_dice_list, np.float32).mean()
             t = time.strftime('%X %x %Z')
             print(t, 'n', n,'loss', batch_dice)

@@ -229,7 +229,6 @@ class DataLoader():
             patient_names = [x.strip() for x in content] 
         else: # load all image in data_root
             sub_dirs = [x[0] for x in os.walk(self.data_root[0])]
-            print(sub_dirs)
             patient_names = []
             for sub_dir in sub_dirs:
                 names = os.listdir(sub_dir)
@@ -258,13 +257,13 @@ class DataLoader():
         load all the training/testing data
         """
         self.patient_names = self.__get_patient_names()
+        assert(len(self.patient_names)  > 0)
         X = []
         W = []
         Y = []
         P = []
         data_num = self.data_num if (self.data_num) else len(self.patient_names)
         for i in range(data_num):
-            print(self.patient_names[i])
             volume_list = []
             for mod_idx in range(len(self.modality_postfix)):
                 volume_name_short = self.patient_names[i] + '_' + self.modality_postfix[mod_idx] + '.' + self.file_postfix
@@ -286,8 +285,8 @@ class DataLoader():
                 if(self.data_resize):
                     label = resize_3D_volume_to_given_shape(label, self.data_resize, 0)
                 Y.append(label)
-                
-        print('{0:} volumes have been loaded'.format(len(X)))
+            if(i%50 == 0 or i == data_num):
+                print('{0:}/{1:} volumes have been loaded'.format(i, data_num))
         self.data   = X
         self.weight = W
         self.label  = Y

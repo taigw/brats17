@@ -2,9 +2,9 @@
 from __future__ import absolute_import, print_function
 import os
 import sys
-from data_loader import load_nifty_volume_as_array
 import numpy as np
 from scipy import ndimage
+from util.data_loader import load_nifty_volume_as_array
 
 def get_largest_component(img):
     s = ndimage.generate_binary_structure(3,1) # iterate structure
@@ -59,16 +59,11 @@ def dice_of_brats_data_set(s_folder, g_folder, patient_names_file, type_idx):
     return dice_all_data
     
 if __name__ == '__main__':
-    s_folder = 'results/valid0_1'
-    g_folder = '/home/wenqili/BRATS/test'
-    patient_names_file = 'config/test_names.txt'
-#s_folder = '/Users/guotaiwang/Documents/workspace/tf_project/NiftyNet/guotai_brats/deepigeos/result_crf_post'
-#    g_folder = '/Users/guotaiwang/Documents/data/BRATS/BRATS2015_Train_croprename'
-#    patient_names_file = '/Users/guotaiwang/Documents/data/BRATS/BRATS2015_Train_croprename/test_names2.txt'
-    #patient_names_file = '/Users/guotaiwang/Documents/workspace/tf_project/NiftyNet/guotai_brats/deepigeos/temp_names.txt'
-    test_types = ['whole','core', 'all']
+    s_folder = 'results'
+    g_folder = '/Users/guotaiwang/Documents/data/BRATS/BRATS2015_Train_croprename'
+    patient_names_file = 'config/test_names_example.txt'
     type_idx = 0
-    
+    test_types = ['whole','core', 'all']
     dice = dice_of_brats_data_set(s_folder, g_folder, patient_names_file, type_idx)
     dice = np.asarray(dice)
     print(dice.shape)

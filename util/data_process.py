@@ -4,14 +4,6 @@ import numpy as np
 import random
 from scipy import ndimage
 
-
-def get_roi_size(inputVolume):
-    [d_idxes, h_idxes, w_idxes] = np.nonzero(inputVolume)
-    mind = d_idxes.min(); maxd = d_idxes.max()
-    minh = h_idxes.min(); maxh = h_idxes.max()
-    minw = w_idxes.min(); maxw = w_idxes.max()
-    return [maxd - mind, maxh - minh, maxw - minw]
-
 def get_roi(temp_label, margin):
     [d_idxes, h_idxes, w_idxes] = np.nonzero(temp_label)
     [D, H, W] = temp_label.shape
@@ -56,25 +48,6 @@ def get_largest_two_component(img, prt = False, threshold = None):
             
             return component1
 
-def get_unique_image_name(img_name_list, subname):
-    img_name = [x for x in img_name_list if subname in x]
-    assert(len(img_name) == 1)
-    return img_name[0]
-
-def load_nifty_volume_as_array(filename):
-    img = nibabel.load(filename)
-    return img.get_data()
-
-def load_all_modalities_in_one_folder(patient_dir):
-    img_name_list = os.listdir(patient_dir)
-    img_list = []
-    sub_name_list = ['flair.nii', 't1ce.nii', 't1.nii', 't2.nii', 'seg.nii']
-    for sub_name in sub_name_list:
-        img_name = get_unique_image_name(img_name_list, sub_name)
-        img   = load_nifty_volume_as_array(os.path.join(patient_dir, img_name))
-        img_list.append(img)
-    return img_list
-
 def fill_holes(img): 
     neg = 1 - img
     s = ndimage.generate_binary_structure(3,1) # iterate structure
@@ -86,6 +59,7 @@ def fill_holes(img):
     max_label = np.where(sizes == max_size)[0] + 1
     component = labeled_array == max_label
     return 1 - component
+
 
 def remove_external_core(lab_main, lab_ext):
     # for each component of lab_ext, compute the overlap with lab_main
@@ -103,25 +77,24 @@ def remove_external_core(lab_main, lab_ext):
             new_lab_ext = np.maximum(new_lab_ext, componenti)
     return new_lab_ext
 
-def get_itensity_statistics(volume, n_pxl, iten_sum, iten_sq_sum):
-    volume = np.asanyarray(volume, np.float32)
-    pixels = volume[volume > 0]
-    n_pxl = n_pxl + len(pixels)
-    iten_sum = iten_sum + pixels.sum()
-    iten_sq_sum = iten_sq_sum + np.square(pixels).sum()
-    return n_pxl, iten_sum, iten_sq_sum
 
-def get_all_patients_dir(data_root):
-    sub_sets = ['HGG/', 'LGG/']
-    all_patients_list = []
-    for sub_source in sub_sets:
-        sub_source = data_root + sub_source
-        patient_list = os.listdir(sub_source)
-        patient_list = [sub_source + x for x in patient_list if 'Brats' in x]
-        all_patients_list.extend(patient_list)
-        print('patients for ', sub_source,len(patient_list))
-    print("total patients ", len(all_patients_list))
-    return all_patients_list
+def get_unique_image_name(img_name_list, subname):
+    img_name = [x for x in img_name_list if subname in x]
+    assert(len(img_name) == 1)
+    return img_name[0]
+
+def load_all_modalities_in_one_folder(patient_dir):
+    img_name_list = os.listdir(patient_dir)
+    img_list = []
+    sub_name_list = ['flair.nii', 't1ce.nii', 't1.nii', 't2.nii', 'seg.nii']
+    for sub_name in sub_name_list:
+        img_name = get_unique_image_name(img_name_list, sub_name)
+        img   = load_nifty_volume_as_array(os.path.join(patient_dir, img_name))
+        img_list.append(img)
+    return img_list
+
+
+
 
 def get_roi_range_in_one_dimention(x0, x1, L):
     margin = L - (x1 - x0)
