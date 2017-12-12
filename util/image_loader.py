@@ -206,7 +206,7 @@ class DataLoader(object):
                 weight = tf.cast(weight, tf.float32)
         # 1, itensity normalization
         if(self.intensity_normalize):
-            image = itensity_normalize_4d_tensor_by_each_channel(image)
+            image = tf.py_func(itensity_normalize_4d_array, [image], tf.float32)
 
         # 1, crop volume
         if(self.train_with_roi_patch):
@@ -307,7 +307,7 @@ class DataLoader(object):
                 one_item['weight'] = tf.constant(weight, tf.float32)
             imgs = tf.constant(imgs, tf.float32)
             if(self.intensity_normalize):
-                imgs = itensity_normalize_4d_tensor_by_each_channel(imgs)
+                imgs = tf.py_func(itensity_normalize_4d_array, [imgs], tf.float32)
             one_item['image']= imgs
             one_item['name'] = patient_names[i]
             yield one_item
