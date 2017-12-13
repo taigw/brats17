@@ -7,7 +7,7 @@ import os
 import sys
 import tensorflow as tf
 from tensorflow.contrib.data import Iterator
-from util.image_loader import *
+from util.data_loader import *
 from util.data_process import *
 from util.train_test_func import *
 from util.parse_config import parse_config
@@ -297,22 +297,19 @@ def test(config_file):
             saver3cr.restore(sess, config_net3cr['model_file'])     
 
     # 3, load test images
-    loader = DataLoader(config_data)
-    test_data = loader.get_dataset('test', shuffle = False)
-  
+    dataloader = DataLoader(config_data)
+    dataloader.load_data()
+    image_num = loader.get_total_image_number()
+    
     # 4, start to test
     test_slice_direction = config_test.get('test_slice_direction', 'all')
     save_folder = config_test['save_folder']
     test_time = []
     struct = ndimage.generate_binary_structure(3, 2)
     margin = config_test.get('roi_patch_margin', 5)
-
-    for one_item in test_data:
-        temp_name = one_item['name']
-        weight    = one_item['weight'].eval()[:,:,:,0]
-        imgs      = one_item['image'].eval()
-        imgs      = [imgs[:,:,:,i] for i in range(imgs.shape[3])]
-
+    
+    for i in range(image_num):
+        [imgs, weight, temp_name] = loader.get_image_data_with_name(i)
         t0 = time.time()
         groi = get_roi(weight > 0, margin)
         temp_imgs = [x[np.ix_(range(groi[0], groi[1]), range(groi[2], groi[3]), range(groi[4], groi[5]))] \
