@@ -34,7 +34,7 @@ class MSNet(TrainableLayer):
         
     def set_params(self, params):
         self.base_chns = params['base_feature_number']
-        self.acti_func = params['acti_func']
+        self.acti_func = params.get('acti_func', 'prelu')
         self.downsample_twice = params['downsample_twice']
         
     def layer_op(self, images, is_training):

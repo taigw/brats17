@@ -252,7 +252,7 @@ def get_roi(volume, margin):
     maxw = min(w_idxes.max() + margin, W)   
     return [mind, maxd, minh, maxh, minw, maxw]
 
-def get_largest_two_component(img, threshold = None):
+def get_largest_two_component(img, print_info = False, threshold = None):
     """
     Get the largest two components of a binary volume
     inputs:
@@ -266,7 +266,8 @@ def get_largest_two_component(img, threshold = None):
     sizes = ndimage.sum(img,labeled_array,range(1,numpatches+1)) 
     sizes_list = [sizes[i] for i in range(len(sizes))]
     sizes_list.sort()
-    print('component size', sizes_list)
+    if(print_info):
+        print('component size', sizes_list)
     if(len(sizes) == 1):
         out_img = img
     else:
