@@ -328,8 +328,8 @@ class DataLoader(object):
             if(self.with_weight and (self.weight_postfix is not None)):
                 dataset['weight'] = tf.constant(wht_names)
             dataset = tf.data.Dataset.from_tensor_slices(dataset)
-            dataset = dataset.map(self.__load_volumes, num_parallel_calls=5)
-            dataset = dataset.map(self.__sample_patch, num_parallel_calls=5)
+            dataset = dataset.map(self.__load_volumes, num_parallel_calls=10)
+            dataset = dataset.map(self.__sample_patch, num_parallel_calls=10)
             dataset = dataset.prefetch(self.batch_size*20)
             if(shuffle):
                 dataset = dataset.shuffle(self.batch_size*20)
