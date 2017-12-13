@@ -15,30 +15,29 @@ class DataLoader():
         inputs:
             config: a dictionary representing parameters
         """
-        self.config = config
+        self.config    = config
         self.data_root = config['data_root']
-        self.modality_postfix = config['modality_postfix']
-        self.intensity_normalize = config.get('intensity_normalize', None)
-        self.label_postfix =  config.get('label_postfix', None)
-        self.file_postfix = config['file_post_fix']
-        self.data_names = config['data_names']
-        self.data_num = config.get('data_num', None)
-        self.data_resize = config.get('data_resize', None)
-        self.with_ground_truth  = config.get('with_ground_truth', False)
-        self.with_flip = config.get('with_flip', False)
-        self.label_convert_source = self.config.get('label_convert_source', None)
-        self.label_convert_target = self.config.get('label_convert_target', None)
+        self.modality_postfix     = config.get('modality_postfix', ['flair','t1', 't1ce', 't2'])
+        self.intensity_normalize  = config.get('intensity_normalize', [True, True, True, True])
+        self.with_ground_truth    = config.get('with_ground_truth', False)
+        self.label_convert_source = config.get('label_convert_source', None)
+        self.label_convert_target = config.get('label_convert_target', None)
+        self.label_postfix = config.get('label_postfix', 'seg')
+        self.file_postfix  = config.get('file_post_fix', 'nii.gz')
+        self.data_names    = config.get('data_names', None)
+        self.data_num      = config.get('data_num', None)
+        self.data_resize   = config.get('data_resize', None)
+        self.with_flip     = config.get('with_flip', False)
+
         if(self.label_convert_source and self.label_convert_target):
             assert(len(self.label_convert_source) == len(self.label_convert_target))
-        if(self.intensity_normalize == None):
-            self.intensity_normalize = [True] * len(self.modality_postfix)
             
     def __get_patient_names(self):
         """
         get the list of patient names, if self.data_names id not None, then load patient 
         names from that file, otherwise search all the names automatically in data_root
         """
-        if(self.data_names):
+        if(self.data_names is not None):
             assert(os.path.isfile(self.data_names))
             with open(self.data_names) as f:
                 content = f.readlines()
@@ -133,7 +132,7 @@ class DataLoader():
         train_with_roi_patch = self.config.get('train_with_roi_patch', False)
         keep_roi_outside = self.config.get('keep_roi_outside', False)
         if(train_with_roi_patch):
-            label_roi_mask = self.config['label_roi_mask']
+            label_roi_mask    = self.config['label_roi_mask']
             roi_patch_margin  = self.config['roi_patch_margin']
 
         # return batch size: [batch_size, slice_num, slice_h, slice_w, moda_chnl]
