@@ -46,13 +46,20 @@ The following commands are examples for these steps. However, you can edit the c
 
 ```bash
 python train.py config/train_wt_ax.txt
+python train.py config/train_wt_sg.txt
+python train.py config/train_wt_cr.txt
 ```
+* Train models for tumor core in axial, sagittal and coronal views respectively. run 
 
-* Train a model for whole tumor in sagittal view, run `python train.py config/train_wt_sg.txt`.
-* Train a model for whole tumor in coronal view, run `python train.py config/train_wt_cr.txt`.
-* Train a model for tumor core in axial view, run `python train.py config/train_tc_ax.txt`.
-* Train a model for tumor core in sagittal view, run `python train.py config/train_tc_sg.txt`.
-* Train a model for tumor core in coronal view, run `python train.py config/train_tc_cr.txt`.
-* Train a model for enhancing core in axial view, run `python train.py config/train_en_ax.txt`.
-* Train a model for enhancing core in sagittal view, run `python train.py config/train_en_sg.txt`.
-* Train a model for enhancing core in coronal view, run `python train.py config/train_en_cr.txt`.
+```bash
+python train.py config/train_tc_ax.txt
+python train.py config/train_tc_sg.txt
+python train.py config/train_tc_cr.txt
+```
+* Train models for enhancing core in axial, sagittal and coronal views respectively. run 
+
+```bash
+python train.py config/train_en_ax.txt
+python train.py config/train_en_sg.txt
+python train.py config/train_en_cr.txt
+```
