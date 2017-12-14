@@ -19,8 +19,11 @@ If you use any resources in this repository, please cite the following papers:
 * Tensorflow. Install tensorflow following instructions from [https://www.tensorflow.org/install/][tensorflow_install].
 [tensorflow_install]: https://www.tensorflow.org/install/
 
-* NiftyNet. Install it by typing `pip install niftynet` or following instructions from [http://niftynet.io/][niftynet_io].
+* NiftyNet. Install it by following instructions from [http://niftynet.io/][niftynet_io] or simply typing:
 [niftynet_io]: http://niftynet.io/
+```bash
+pip install niftynet
+```
 
 * BraTS dataset. Data can be downloaded from [http://braintumorsegmentation.org/][brats_link].
 [brats_link]: http://braintumorsegmentation.org/
@@ -29,34 +32,43 @@ If you use any resources in this repository, please cite the following papers:
 ## 1, Prepare data
 * Download BraTS dataset, and uncompress the file to `./data` folder. For example, the training set will be in `./data/Brats17TrainingData` and the validation set will be in `./data/Brats17ValidationData`.
 
-* Process the data. Run `python pre_process.py`
+* Process the data. Run:
+```bash 
+python pre_process.py
+```
 
 ## 2, Use pre-trained models
 * Download pre-trained models from [here][model_download], and save these files in `./model_pretrain`.
 [model_download]: https://drive.google.com/open?id=1moxSHiX1oaUW66h-Sd1iwaTuxfI-YlBA
-* Obtain binary segmentation of whole tumors, run `python test.py config/test_wt.txt`.
-* Obtain segmentation of all the tumor subregions, run `python test.py config/test_all_class.txt`.
+* Obtain binary segmentation of whole tumors, run:
+```bash
+python test.py config/test_wt.txt
+```
+* Obtain segmentation of all the tumor subregions, run:
+```bash 
+python test.py config/test_all_class.txt
+```
 
 ## 3, How to train
 The trainig process needs 9 steps, with axial view, sagittal view, coronal view for whole tumor, tumor core, and enhancing core, respectively.
 
 The following commands are examples for these steps. However, you can edit the corresponding `*.txt` files for different configurations.
 
-* Train models for whole tumor in axial, sagittal and coronal views respectively. run 
+* Train models for whole tumor in axial, sagittal and coronal views respectively. Run: 
 
 ```bash
 python train.py config/train_wt_ax.txt
 python train.py config/train_wt_sg.txt
 python train.py config/train_wt_cr.txt
 ```
-* Train models for tumor core in axial, sagittal and coronal views respectively. run 
+* Train models for tumor core in axial, sagittal and coronal views respectively. Run: 
 
 ```bash
 python train.py config/train_tc_ax.txt
 python train.py config/train_tc_sg.txt
 python train.py config/train_tc_cr.txt
 ```
-* Train models for enhancing core in axial, sagittal and coronal views respectively. run 
+* Train models for enhancing core in axial, sagittal and coronal views respectively. Run: 
 
 ```bash
 python train.py config/train_en_ax.txt
@@ -65,7 +77,8 @@ python train.py config/train_en_cr.txt
 ```
 
 ## How to test
-Similar to 'Use pre-trained models', write a configure file that is similar to `config/test_wt.txt` or `config/test_wt.txt` and set the value of model_file to your own model files. Run
+Similar to 'Use pre-trained models', write a configure file that is similar to `config/test_wt.txt` or `config/test_wt.txt` and 
+set the value of model_file to your own model files. Run:
 ```bash
 python test.py your_own_config_for_test.txt
 ```
