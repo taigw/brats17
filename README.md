@@ -24,3 +24,6 @@ If you use any resources in this repository, please cite the following papers:
 
 4, BraTS dataset. Data can be downloaded from [http://braintumorsegmentation.org/][brats_link].
 [brats_link]: http://braintumorsegmentation.org/
+
+# How to use
+## Prepare data
