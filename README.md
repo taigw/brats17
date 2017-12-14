@@ -14,19 +14,19 @@ If you use any resources in this repository, please cite the following papers:
 [niftynet_arxiv]: https://arxiv.org/abs/1709.03485
 
 # Requirements
-1, A CUDA compatable GPU with memoery larger than 6GB is recommended for training. For testing only, a CUDA compatable GPU may not be required.
+* A CUDA compatable GPU with memoery larger than 6GB is recommended for training. For testing only, a CUDA compatable GPU may not be required.
 
-2, Tensorflow. Install tensorflow following instructions from [https://www.tensorflow.org/install/][tensorflow_install].
+* Tensorflow. Install tensorflow following instructions from [https://www.tensorflow.org/install/][tensorflow_install].
 [tensorflow_install]: https://www.tensorflow.org/install/
 
-3, NiftyNet. Install it by typing `pip install niftynet` or following instructions from [http://niftynet.io/][niftynet_io].
+* NiftyNet. Install it by typing `pip install niftynet` or following instructions from [http://niftynet.io/][niftynet_io].
 [niftynet_io]: http://niftynet.io/
 
-4, BraTS dataset. Data can be downloaded from [http://braintumorsegmentation.org/][brats_link].
+* BraTS dataset. Data can be downloaded from [http://braintumorsegmentation.org/][brats_link].
 [brats_link]: http://braintumorsegmentation.org/
 
 # How to use
 ## 1, Prepare data
-1.1 Download BraTS dataset, and uncompress the file to `./data` folder. For example, the training set will be in `./data/Brats17TrainingData` and the validation set will be in `./data/Brats17ValidationData`.
+* Download BraTS dataset, and uncompress the file to `./data` folder. For example, the training set will be in `./data/Brats17TrainingData` and the validation set will be in `./data/Brats17ValidationData`.
 
-1.2 Process the data. Run `python pre_process.py`
+* Process the data. Run `python pre_process.py`
