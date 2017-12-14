@@ -27,4 +27,4 @@ If you use any resources in this repository, please cite the following papers:
 
 # How to use
 ## 1, Prepare data
-Download BraTS training and testing data, and uncompress the file to `./data` folder. 
+Download BraTS dataset, and uncompress the file to `./data` folder. For example, the training set will be in `./data/Brats17TrainingData` and the validation set will be in `./data/Brats17ValidationData`.
