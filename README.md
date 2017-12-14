@@ -34,3 +34,5 @@ If you use any resources in this repository, please cite the following papers:
 ## 2, Use pre-trained models
 * Download pre-trained models from [here][model_download], and save these files in `./model_pretrain`.
 [model_download]: https://drive.google.com/open?id=1moxSHiX1oaUW66h-Sd1iwaTuxfI-YlBA
+* Obtain binary segmentation of whole tumors, run `python test.py config/test_wt.txt`.
+* Obtain segmentation of all the tumor subregions, run `python test.py config/test_all_class.txt`.
