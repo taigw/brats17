@@ -55,18 +55,21 @@ The trainig process needs 9 steps, with axial view, sagittal view, coronal view 
 The following commands are examples for these steps. However, you can edit the corresponding `*.txt` files for different configurations.
 
 * Train models for whole tumor in axial, sagittal and coronal views respectively. Run: 
+
 ```bash
 python train.py config/train_wt_ax.txt
 python train.py config/train_wt_sg.txt
 python train.py config/train_wt_cr.txt
 ```
 * Train models for tumor core in axial, sagittal and coronal views respectively. Run: 
+
 ```bash
 python train.py config/train_tc_ax.txt
 python train.py config/train_tc_sg.txt
 python train.py config/train_tc_cr.txt
 ```
 * Train models for enhancing core in axial, sagittal and coronal views respectively. Run: 
+
 ```bash
 python train.py config/train_en_ax.txt
 python train.py config/train_en_sg.txt
