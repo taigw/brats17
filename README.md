@@ -19,4 +19,5 @@ If you use any resources in this repository, please cite the following papers:
 2, Tensorflow. Install tensorflow following instructions from [https://www.tensorflow.org/install/][tensorflow_install].
 [tensorflow_install]: https://www.tensorflow.org/install/
 
-2, NiftyNet. Install it by typing '''bash pip install niftynet ''' or following instructions from 
+3, NiftyNet. Install it by typing "pip install niftynet" or following instructions from [http://niftynet.io/][niftynet_io].
+[niftynet_io]: http://niftynet.io/
