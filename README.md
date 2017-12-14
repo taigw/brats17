@@ -21,3 +21,6 @@ If you use any resources in this repository, please cite the following papers:
 
 3, NiftyNet. Install it by typing "pip install niftynet" or following instructions from [http://niftynet.io/][niftynet_io].
 [niftynet_io]: http://niftynet.io/
+
+4, BraTS dataset. Data can be downloaded from [http://braintumorsegmentation.org/][brats_link].
+[brats_link]: http://braintumorsegmentation.org/
