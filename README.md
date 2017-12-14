@@ -15,5 +15,6 @@ If you use any resources in this repository, please cite the following papers:
 
 # Requirements
 1, a CUDA compatable GPU with memoery larger than 6GB is recommended for training. For testing only, a CUDA compatable GPU may not be required.
+
 2, tensorflow. Install tensorflow following instructions from [https://www.tensorflow.org/install/][tensorflow_install].
 [tensorflow_install]: https://www.tensorflow.org/install/
