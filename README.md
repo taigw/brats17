@@ -30,3 +30,7 @@ If you use any resources in this repository, please cite the following papers:
 * Download BraTS dataset, and uncompress the file to `./data` folder. For example, the training set will be in `./data/Brats17TrainingData` and the validation set will be in `./data/Brats17ValidationData`.
 
 * Process the data. Run `python pre_process.py`
+
+## 2, Use pre-trained models
+* Download pre-trained models from [here][model_download], and save these files in `./model_pretrain`.
+[model_download]: https://drive.google.com/open?id=1moxSHiX1oaUW66h-Sd1iwaTuxfI-YlBA
