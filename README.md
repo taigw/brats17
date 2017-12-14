@@ -36,3 +36,8 @@ If you use any resources in this repository, please cite the following papers:
 [model_download]: https://drive.google.com/open?id=1moxSHiX1oaUW66h-Sd1iwaTuxfI-YlBA
 * Obtain binary segmentation of whole tumors, run `python test.py config/test_wt.txt`.
 * Obtain segmentation of all the tumor subregions, run `python test.py config/test_all_class.txt`.
+
+## 3, How to train
+The trainig process needs 9 steps, with axial view, sagittal view, coronal view for whole tumor, tumor core, and enhance tumor core, respectively.
+
+The following commeands are examples for these steps. However, you can edit the corresponding `*.txt` files for different configureation.
