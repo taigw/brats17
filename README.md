@@ -26,4 +26,4 @@ If you use any resources in this repository, please cite the following papers:
 [brats_link]: http://braintumorsegmentation.org/
 
 # How to use
-## Prepare data
+## 1, Prepare data
