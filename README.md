@@ -21,7 +21,7 @@ An example of brain tumor segmentation result.
 
 * Tensorflow. Install tensorflow following instructions from https://www.tensorflow.org/install/
 
-* NiftyNet. Install it by following instructions from http://niftynet.io/ or simply typing:
+* NiftyNet. Install it by following instructions from http://niftynet.readthedocs.io/en/dev/installation.html or simply typing:
 ```bash
 pip install niftynet
 ```
