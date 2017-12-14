@@ -66,4 +66,6 @@ python train.py config/train_en_cr.txt
 
 ## How to test
 Similar to 'Use pre-trained models', write a configure file that is similar to `config/test_wt.txt` or `config/test_wt.txt` and set the value of model_file to your own model files. Run
-`python test.py your_own_config_for_test.txt`
+```bash
+python test.py your_own_config_for_test.txt
+```
