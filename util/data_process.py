@@ -20,7 +20,7 @@ def search_file_in_folder_list(folder_list, file_name):
             file_exist = True
             break
     if(file_exist == False):
-        raise ValueError('file not exist: {0:}'.format(file_name))
+        raise ValueError('{0:} is not found in {1:}'.format(file_name, folder))
     return full_file_name
 
 def load_nifty_volume_as_array(filename):
@@ -327,3 +327,22 @@ def remove_external_core(lab_main, lab_ext):
             new_lab_ext = np.maximum(new_lab_ext, componenti)
     return new_lab_ext
 
+def binary_dice3d(s,g):
+    """
+    dice score of 3d binary volumes
+    inputs: 
+        s: segmentation volume
+        g: ground truth volume
+    outputs:
+        dice: the dice score
+    """
+    assert(len(s.shape)==3)
+    [Ds, Hs, Ws] = s.shape
+    [Dg, Hg, Wg] = g.shape
+    assert(Ds==Dg and Hs==Hg and Ws==Wg)
+    prod = np.multiply(s, g)
+    s0 = prod.sum()
+    s1 = s.sum()
+    s2 = g.sum()
+    dice = 2.0*s0/(s1 + s2 + 1e-10)
+    return dice

@@ -3,33 +3,7 @@ from __future__ import absolute_import, print_function
 import os
 import sys
 import numpy as np
-from scipy import ndimage
-from util.data_loader import load_nifty_volume_as_array
-
-def get_largest_component(img):
-    s = ndimage.generate_binary_structure(3,1) # iterate structure
-    labeled_array, numpatches = ndimage.label(img,s) # labeling
-    sizes = ndimage.sum(img,labeled_array,range(1,numpatches+1)) 
-    max_label = np.where(sizes == sizes.max())[0] + 1
-    return labeled_array == max_label
-
-def binary_dice3d(s,g):
-    assert(len(s.shape)==3)
-    [Ds, Hs, Ws] = s.shape
-    [Dg, Hg, Wg] = g.shape
-    assert(Ds==Dg and Hs==Hg and Ws==Wg)
-    prod = np.multiply(s, g)
-    s0 = prod.sum()
-    s1 = s.sum()
-    s2 = g.sum()
-    dice = 2.0*s0/(s1 + s2 + 0.00001)
-    return dice
-
-def dice_of_binary_volumes(s_name, g_name):
-    s = load_nifty_volume_as_array(s_name)
-    g = load_nifty_volume_as_array(g_name)
-    dice = binary_dice3d(s, g)
-    return dice
+from util.data_process import load_nifty_volume_as_array, binary_dice3d
 
 def dice_of_brats_data_set(s_folder, g_folder, patient_names_file, type_idx):
     with open(patient_names_file) as f:
@@ -38,7 +12,7 @@ def dice_of_brats_data_set(s_folder, g_folder, patient_names_file, type_idx):
     dice_all_data = []
     for i in range(len(patient_names)):
         s_name = os.path.join(s_folder, patient_names[i] + '.nii.gz')
-        g_name = os.path.join(g_folder, patient_names[i] + '_Label.nii.gz')
+        g_name = os.path.join(g_folder, patient_names[i] + '_seg.nii.gz')
         s_volume = load_nifty_volume_as_array(s_name)
         g_volume = load_nifty_volume_as_array(g_name)
         dice_one_volume = []
@@ -55,24 +29,25 @@ def dice_of_brats_data_set(s_folder, g_folder, patient_names_file, type_idx):
                 temp_dice = binary_dice3d(s_volume == label, g_volume == label)
                 dice_one_volume.append(temp_dice)
         dice_all_data.append(dice_one_volume)
-        print(dice_one_volume[0])
     return dice_all_data
     
 if __name__ == '__main__':
     s_folder = 'results'
-    g_folder = '/Users/guotaiwang/Documents/data/BRATS/BRATS2015_Train_croprename'
+    g_folder = 'data/Brats17TrainingData_crop_renamed'
     patient_names_file = 'config/test_names_example.txt'
-    type_idx = 0
     test_types = ['whole','core', 'all']
-    dice = dice_of_brats_data_set(s_folder, g_folder, patient_names_file, type_idx)
-    dice = np.asarray(dice)
-    print(dice.shape)
-    dice_mean = dice.mean(axis = 0)
-    dice_std  = dice.std(axis = 0)
-    test_type = test_types[type_idx]
-    np.savetxt(s_folder + '/dice_{0:}.txt'.format(test_type), dice)
-    np.savetxt(s_folder + '/dice_{0:}_mean.txt'.format(test_type), dice_mean)
-    np.savetxt(s_folder + '/dice_{0:}_std.txt'.format(test_type), dice_std)
-    print('dice mean ', dice_mean)
-    print('dice std  ', dice_std)
+    for type_idx in range(3):
+        dice = dice_of_brats_data_set(s_folder, g_folder, patient_names_file, type_idx)
+        dice = np.asarray(dice)
+        dice_mean = dice.mean(axis = 0)
+        dice_std  = dice.std(axis  = 0)
+        test_type = test_types[type_idx]
+        np.savetxt(s_folder + '/dice_{0:}.txt'.format(test_type), dice)
+        np.savetxt(s_folder + '/dice_{0:}_mean.txt'.format(test_type), dice_mean)
+        np.savetxt(s_folder + '/dice_{0:}_std.txt'.format(test_type), dice_std)
+        print('tissue type', test_type)
+        if(test_type == 'all'):
+            print('tissue label', [1, 2, 4])
+        print('dice mean  ', dice_mean)
+        print('dice std   ', dice_std)
  

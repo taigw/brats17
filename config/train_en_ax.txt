@@ -1,0 +1,30 @@
+[data]
+data_root             = [data/Brats17TrainingData_crop_renamed]
+data_names            = config/train_names_all_lggx3.txt 
+with_ground_truth     = True
+batch_size            = 5
+data_shape            = [19, 64, 64, 4]
+label_shape           = [11, 64, 64, 1]
+label_convert_source  = [0, 1, 2, 4]
+label_convert_target  = [0, 0, 0, 1] 
+batch_slice_direction = axial
+train_with_roi_patch  = True
+label_roi_mask        = [1,4]
+roi_patch_margin      = 5
+
+[network]
+net_type            = MSNet
+net_name            = MSNet_EN32
+downsample_twice    = False
+class_num           = 2
+
+[training]
+learning_rate      = 1e-3
+decay              = 1e-7
+maximal_iteration  = 20000
+snapshot_iteration = 5000
+start_iteration    = 0
+test_iteration     = 100
+test_step          = 10
+model_pre_trained  = 
+model_save_prefix  = model/msnet_en32

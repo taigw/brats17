@@ -234,7 +234,8 @@ def test(config_file):
             net3cr.set_params(config_net3cr)
             predicty3cr = net3cr(x3cr, is_training = True)
             proby3cr = tf.nn.softmax(predicty3cr)
-        
+
+    # 3, create session and load trained models
     all_vars = tf.global_variables()
     sess = tf.InteractiveSession()   
     sess.run(tf.global_variables_initializer())  
@@ -284,12 +285,12 @@ def test(config_file):
             saver3cr = tf.train.Saver(net3cr_vars)
             saver3cr.restore(sess, config_net3cr['model_file'])     
 
-    # 3, load test images
+    # 4, load test images
     dataloader = DataLoader(config_data)
     dataloader.load_data()
     image_num = dataloader.get_total_image_number()
     
-    # 4, start to test
+    # 5, start to test
     test_slice_direction = config_test.get('test_slice_direction', 'all')
     save_folder = config_test['save_folder']
     test_time = []
@@ -303,7 +304,8 @@ def test(config_file):
         temp_imgs = [x[np.ix_(range(groi[0], groi[1]), range(groi[2], groi[3]), range(groi[4], groi[5]))] \
                         for x in imgs]
         temp_weight = weight[np.ix_(range(groi[0], groi[1]), range(groi[2], groi[3]), range(groi[4], groi[5]))]
-
+        
+        # 5.1, test of 1st network
         if(config_net1):
             data_shapes  = [ data_shape1[:-1],  data_shape1[:-1],  data_shape1[:-1]]
             label_shapes = [label_shape1[:-1], label_shape1[:-1], label_shape1[:-1]]
@@ -329,7 +331,7 @@ def test(config_file):
             pred1_lc = get_largest_two_component(pred1_lc, True, wt_threshold)
             out_label = pred1_lc
         else:
-            # 4.2, test of 2nd network
+            # 5.2, test of 2nd network
             if(pred1.sum() == 0):
                 print('net1 output is null', temp_name)
                 roi2 = get_roi(temp_imgs[0] > 0, margin)
@@ -359,7 +361,7 @@ def test(config_file):
             pred2 = np.asarray(np.argmax(prob2, axis = 3), np.uint16)
             pred2 = pred2 * sub_weight
              
-            # 4.3, test of 3rd network
+            # 5.3, test of 3rd network
             if(pred2.sum() == 0):
                 [roid, roih, roiw] = sub_imgs[0].shape
                 roi3 = [0, roid, 0, roih, 0, roiw]
@@ -394,7 +396,7 @@ def test(config_file):
             pred3 = np.asarray(np.argmax(prob3, axis = 3), np.uint16)
             pred3 = pred3 * subsub_weight
              
-            # 4.4, fuse results at 3 levels
+            # 5.4, fuse results at 3 levels
             # convert subsub_label to full size (non-enhanced)
             label3_roi = np.zeros_like(pred2)
             label3_roi[np.ix_(range(roi3[0], roi3[1]), range(roi3[2], roi3[3]), range(roi3[4], roi3[5]))] = pred3
@@ -428,7 +430,7 @@ def test(config_file):
             out_label[label3>0] = 3
             out_label = np.asarray(out_label, np.int16)
 
-            # 4.5, convert label and save output
+            # 5.5, convert label and save output
             label_convert_source = config_test.get('label_convert_source', None)
             label_convert_target = config_test.get('label_convert_target', None)
             if(label_convert_source and label_convert_target):

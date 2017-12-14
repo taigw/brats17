@@ -16,13 +16,12 @@ from util.train_test_func import *
 from util.parse_config import parse_config
 from util.MSNet import MSNet
 
-
-import pickle
 class NetFactory(object):
     @staticmethod
     def create(name):
         if name == 'MSNet':
             return MSNet
+        # add your own networks here
         print('unsupported network:', name)
         exit()
 
