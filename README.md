@@ -12,3 +12,8 @@ If you use any resources in this repository, please cite the following papers:
 * [2] Eli Gibson*, Wenqi Li*, Carole Sudre, Lucas Fidon, Dzhoshkun I. Shakir, Guotai Wang, Zach Eaton-Rosen, Robert Gray, Tom Doel, Yipeng Hu, Tom Whyntie, Parashkev Nachev, Marc Modat, Dean C. Barratt, Sébastien Ourselin, M. Jorge Cardoso^, Tom Vercauteren^.
 "[NiftyNet: a deep-learning platform for medical imaging.][niftynet_arxiv]" arXiv preprint arXiv: 1709.03485 (2017). 
 [niftynet_arxiv]: https://arxiv.org/abs/1709.03485
+
+# Requirements
+1, a CUDA compatable GPU with memoery larger than 6GB is recommended for training. For testing only, a CUDA compatable GPU may not be required.
+2, tensorflow. Install tensorflow following instructions from [https://www.tensorflow.org/install/][tensorflow_install].
+[tensorflow_install]: https://www.tensorflow.org/install/
