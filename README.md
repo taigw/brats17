@@ -40,7 +40,7 @@ If you use any resources in this repository, please cite the following papers:
 ## 3, How to train
 The trainig process needs 9 steps, with axial view, sagittal view, coronal view for whole tumor, tumor core, and enhancing core, respectively.
 
-The following commands are examples for these steps. However, you can edit the corresponding `*.txt` files for different configuration.
+The following commands are examples for these steps. However, you can edit the corresponding `*.txt` files for different configurations.
 
 * Train models for whole tumor in axial, sagittal and coronal views respectively. run 
 
@@ -63,3 +63,7 @@ python train.py config/train_en_ax.txt
 python train.py config/train_en_sg.txt
 python train.py config/train_en_cr.txt
 ```
+
+## How to test
+Similar to 'Use pre-trained models', write a configure file that is similar to `config/test_wt.txt` or `config/test_wt.txt` and set the value of model_file to your own model files. Run
+`python test.py your_own_config_for_test.txt`
