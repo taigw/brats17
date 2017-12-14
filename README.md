@@ -3,6 +3,6 @@ This repository provides source code and pre-trained models for brain tumor segm
 * Guotai Wang, Wenqi Li, Sebastien Ourselin, Tom Vercauteren. "[Automatic Brain Tumor Segmentation using Cascaded Anisotropic Convolutional Neural Networks.][acnn_arxiv]" arXiv preprint arXiv:1710.04043 (2017).
 [acnn_arxiv]: https://arxiv.org/abs/1709.00382
 
-* E. Gibson*, W. Li*, C. Sudre, L. Fidon, D. I. Shakir, G. Wang, Z. Eaton-Rosen, R. Gray, T. Doel, Y. Hu, T. Whyntie, P. Nachev, M. Modat, D. C. Barratt, S. Ourselin, M. J. Cardoso^ and T. Vercauteren^.
+* Eli Gibson*, Wenqi Li*, Carole Sudre, Lucas Fidon, Dzhoshkun I. Shakir, Guotai Wang, Zach Eaton-Rosen, Robert Gray, Tom Doel, Yipeng Hu, Tom Whyntie, Parashkev Nachev, Marc Modat, Dean C. Barratt, Sébastien Ourselin, M. Jorge Cardoso^, Tom Vercauteren^.
 "[NiftyNet: a deep-learning platform for medical imaging.][niftynet_arxiv]" arXiv preprint arXiv: 1709.03485 (2017). 
 [niftynet_arxiv]: https://arxiv.org/abs/1709.03485
