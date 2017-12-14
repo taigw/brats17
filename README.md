@@ -1,7 +1,8 @@
 # Overview
 This repository provides source code and pre-trained models for brain tumor segmentation with BraTS dataset. The method is detailed in [1], and it won the 2nd place of MICCAI 2017 BraTS Challenge. 
 This implementation is based on NiftyNet and Tensorflow. While NiftyNet provides more automatic pipelines for dataloading, training, testing and evaluation, this naive implementation only makes use of NiftyNet for network definition, so that it is lightweight and extensible. A demo that makes more use of NiftyNet is proivde [here][nfitynet_demo].
-[niftynet_demo]: https://cmiclab.cs.ucl.ac.uk/CMIC/NiftyNet/tree/dev/demos/BRATS17
+[nfitynet_demo]: https://cmiclab.cs.ucl.ac.uk/CMIC/NiftyNet/tree/dev/demos/BRATS17
+
 If you use it, please cite the following papers:
 
 * [1] Guotai Wang, Wenqi Li, Sebastien Ourselin, Tom Vercauteren. "[Automatic Brain Tumor Segmentation using Cascaded Anisotropic Convolutional Neural Networks.][acnn_arxiv]" arXiv preprint arXiv:1710.04043 (2017).
