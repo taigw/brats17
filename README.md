@@ -82,3 +82,10 @@ set the value of model_file to your own model files. Run:
 ```bash
 python test.py your_own_config_for_test.txt
 ```
+
+## 5, Evaluation
+Calcuate dice scores between segmentation and the ground truth, run:
+```bash
+python evaluation.py
+```
+You may need to edit the parameters for segmentation folder and ground truth folder. 
