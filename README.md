@@ -13,6 +13,8 @@ If you use any resources in this repository, please cite the following papers:
 "[NiftyNet: a deep-learning platform for medical imaging.][niftynet_arxiv]" arXiv preprint arXiv: 1709.03485 (2017). 
 [niftynet_arxiv]: https://arxiv.org/abs/1709.03485
 
+![A slice from BRATS17](./data/example_seg.png)
+
 # Requirements
 * A CUDA compatable GPU with memoery not less than 6GB is recommended for training. For testing only, a CUDA compatable GPU may not be required.
 
