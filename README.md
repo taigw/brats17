@@ -14,6 +14,7 @@ If you use any resources in this repository, please cite the following papers:
 [niftynet_arxiv]: https://arxiv.org/abs/1709.03485
 
 ![A slice from BRATS17](./data/example_seg.png)
+
 An example of brain tumor segmentation result.
 
 # Requirements
