@@ -33,6 +33,7 @@ pip install niftynet
 * Download BraTS dataset, and uncompress the file to `./data` folder. For example, the training set will be in `./data/Brats17TrainingData` and the validation set will be in `./data/Brats17ValidationData`.
 
 * Process the data. Run:
+
 ```bash 
 python pre_process.py
 ```
@@ -40,10 +41,12 @@ python pre_process.py
 ## 2, Use pre-trained models
 * Download pre-trained models from https://drive.google.com/open?id=1moxSHiX1oaUW66h-Sd1iwaTuxfI-YlBA, and save these files in `./model_pretrain`.
 * Obtain binary segmentation of whole tumors, run:
+
 ```bash
 python test.py config/test_wt.txt
 ```
 * Obtain segmentation of all the tumor subregions, run:
+
 ```bash 
 python test.py config/test_all_class.txt
 ```
