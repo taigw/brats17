@@ -14,7 +14,9 @@ If you use any resources in this repository, please cite the following papers:
 [niftynet_arxiv]: https://arxiv.org/abs/1709.03485
 
 # Requirements
-1, a CUDA compatable GPU with memoery larger than 6GB is recommended for training. For testing only, a CUDA compatable GPU may not be required.
+1, A CUDA compatable GPU with memoery larger than 6GB is recommended for training. For testing only, a CUDA compatable GPU may not be required.
 
-2, tensorflow. Install tensorflow following instructions from [https://www.tensorflow.org/install/][tensorflow_install].
+2, Tensorflow. Install tensorflow following instructions from [https://www.tensorflow.org/install/][tensorflow_install].
 [tensorflow_install]: https://www.tensorflow.org/install/
+
+2, NiftyNet. Install it by typing '''bash pip install niftynet ''' or following instructions from 
