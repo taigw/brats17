@@ -96,8 +96,8 @@ def get_random_roi_sampling_center(input_shape, output_shape, sample_mode, bound
     inputs:
         input_shape: the shape of sampled volume
         output_shape: the desired roi shape
-        sample_mode: 'full': the entire roi should be inside the input volume
-                     'valid': only the roi centre should be inside the input volume
+        sample_mode: 'valid': the entire roi should be inside the input volume
+                     'full': only the roi centre should be inside the input volume
         bounding_box: the bounding box which the roi center should be limited to
     outputs:
         center: the output center coordinate of a roi
