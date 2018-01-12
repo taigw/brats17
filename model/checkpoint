@@ -1,0 +1,6 @@
+model_checkpoint_path: "msnet_wt32cr_5000.ckpt"
+all_model_checkpoint_paths: "msnet_wt32cr_1000.ckpt"
+all_model_checkpoint_paths: "msnet_wt32cr_2000.ckpt"
+all_model_checkpoint_paths: "msnet_wt32cr_3000.ckpt"
+all_model_checkpoint_paths: "msnet_wt32cr_4000.ckpt"
+all_model_checkpoint_paths: "msnet_wt32cr_5000.ckpt"

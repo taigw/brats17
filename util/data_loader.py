@@ -16,7 +16,7 @@ class DataLoader():
             config: a dictionary representing parameters
         """
         self.config    = config
-        self.data_root = config['data_root']
+        self.data_root = config['data_root'] if type(config['data_root']) is list else [config['data_root']]
         self.modality_postfix     = config.get('modality_postfix', ['flair','t1', 't1ce', 't2'])
         self.intensity_normalize  = config.get('intensity_normalize', [True, True, True, True])
         self.with_ground_truth    = config.get('with_ground_truth', False)
@@ -37,36 +37,59 @@ class DataLoader():
         get the list of patient names, if self.data_names id not None, then load patient 
         names from that file, otherwise search all the names automatically in data_root
         """
-        if(self.data_names is not None):
-            assert(os.path.isfile(self.data_names))
-            with open(self.data_names) as f:
-                content = f.readlines()
-            patient_names = [x.strip() for x in content] 
-        else: # load all image in data_root
-            sub_dirs = [x[0] for x in os.walk(self.data_root[0])]
-            patient_names = []
-            for sub_dir in sub_dirs:
-                names = os.listdir(sub_dir)
-                if(sub_dir == self.data_root[0]):
-                    sub_patient_names = []
-                    for x in names:
-                        if(self.file_postfix in x):
-                            idx = x.rfind('_')
-                            xsplit = x[:idx]
-                            sub_patient_names.append(xsplit)
-                else:
-                    sub_dir_name = sub_dir[len(self.data_root[0])+1:]
-                    sub_patient_names = []
-                    for x in names:
-                        if(self.file_postfix in x):
-                            idx = x.rfind('_')
-                            xsplit = os.path.join(sub_dir_name,x[:idx])
-                            sub_patient_names.append(xsplit)                    
-                sub_patient_names = list(set(sub_patient_names))
-                sub_patient_names.sort()
-                patient_names.extend(sub_patient_names)   
-        return patient_names
+        if('.nii' in self.file_postfix):
+            if(self.data_names is not None):
+                assert(os.path.isfile(self.data_names))
+                with open(self.data_names) as f:
+                    content = f.readlines()
+                patient_names = [x.strip() for x in content] 
+            else: # load all image in data_root
+                sub_dirs = [x[0] for x in os.walk(self.data_root[0])]
+                patient_names = []
+                for sub_dir in sub_dirs:
+                    names = os.listdir(sub_dir)
+                    if(sub_dir == self.data_root[0]):
+                        sub_patient_names = []
+                        for x in names:
+                            if(self.file_postfix in x):
+                                idx = x.rfind('_')
+                                xsplit = x[:idx]
+                                sub_patient_names.append(xsplit)
+                    else:
+                        sub_dir_name = sub_dir[len(self.data_root[0])+1:]
+                        sub_patient_names = []
+                        for x in names:
+                            if(self.file_postfix in x):
+                                idx = x.rfind('_')
+                                xsplit = os.path.join(sub_dir_name,x[:idx])
+                                sub_patient_names.append(xsplit)                    
+                    sub_patient_names = list(set(sub_patient_names))
+                    sub_patient_names.sort()
+                    patient_names.extend(sub_patient_names)   
     
+        else:
+            patient_names = os.listdir(self.data_root[0])
+            patient_names = [name for name in patient_names if 'brats' in name]
+        return patient_names
+
+    def __load_one_volume(self, patient_name, mod):
+        if('.nii' in self.file_postfix):
+            volume_name_short = patient_name + '_' + mod + '.' + self.file_postfix
+            volume_name = search_file_in_folder_list(self.data_root, volume_name_short)
+            volume = load_nifty_volume_as_array(volume_name)
+        else:
+            patient_dir = os.path.join(self.data_root[0], patient_name)
+            img_file_dirs = os.listdir(patient_dir)
+            volume_name  = None
+            for img_file_dir in img_file_dirs:
+                if(mod+'.' in img_file_dir):
+                    volume_name = img_file_dir + '/' + img_file_dir + '.' + self.file_postfix
+                    break
+            assert(volume_name is not None)
+            volume_name = os.path.join(patient_dir, volume_name)
+            volume = load_3d_volume_as_array(volume_name)
+        return volume
+
     def load_data(self):
         """
         load all the training/testing data
@@ -80,9 +103,7 @@ class DataLoader():
         for i in range(data_num):
             volume_list = []
             for mod_idx in range(len(self.modality_postfix)):
-                volume_name_short = self.patient_names[i] + '_' + self.modality_postfix[mod_idx] + '.' + self.file_postfix
-                volume_name = search_file_in_folder_list(self.data_root, volume_name_short)
-                volume = load_nifty_volume_as_array(volume_name)
+                volume = self.__load_one_volume(self.patient_names[i], self.modality_postfix[mod_idx])
                 if(self.data_resize):
                     volume = resize_3D_volume_to_given_shape(volume, self.data_resize, 1)
                 if(mod_idx == 0):
@@ -93,9 +114,7 @@ class DataLoader():
             X.append(volume_list)
             W.append(weight)
             if(self.with_ground_truth):
-                label_name_short = self.patient_names[i] + '_' + self.label_postfix + '.' + self.file_postfix
-                label_name = search_file_in_folder_list(self.data_root, label_name_short)
-                label = load_nifty_volume_as_array(label_name)
+                label = self.__load_one_volume(self.patient_names[i], self.label_postfix)
                 if(self.data_resize):
                     label = resize_3D_volume_to_given_shape(label, self.data_resize, 0)
                 Y.append(label)

@@ -1,7 +1,8 @@
 [data]
-data_root         = [/home/guotwang/data/brats_docker_data/pre_process]
-data_names        = config/test_names.txt
+data_root         = /input_dir/Testing/HGG_LGG
+save_folder       = /output_dir
 modality_postfix  = [Flair, T1, T1c, T2]
+file_post_fix     = mha
 
 [network1ax]
 net_type            = MSNet
@@ -87,4 +88,3 @@ model_file          = model/msnet_en32cr_5000.ckpt
 
 [testing]
 test_slice_direction = all
-save_folder = result_all

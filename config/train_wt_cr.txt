@@ -1,12 +1,14 @@
 [data]
-data_root             = [data/Brats17TrainingData_crop_renamed]
+data_root             = [/home/guotwang/data/brats_docker_data/pre_process]
 data_names            = config/train_names_all.txt 
+modality_postfix      = [Flair, T1, T1c, T2]
+label_postfix         = OT
 with_ground_truth     = True
 batch_size            = 5
 data_shape            = [19, 144, 144, 4]
 label_shape           = [11, 144, 144, 1]
-label_convert_source  = [0, 1, 2, 4]
-label_convert_target  = [0, 1, 1, 1]
+label_convert_source  = [0, 1, 2, 3, 4]
+label_convert_target  = [0, 1, 1, 1, 1]
 batch_slice_direction = coronal
 train_with_roi_patch  = False
 label_roi_mask        = 
@@ -21,10 +23,10 @@ class_num           = 2
 [training]
 learning_rate      = 1e-3
 decay              = 1e-7
-maximal_iteration  = 20000
-snapshot_iteration = 5000
-start_iteration    = 0
+maximal_iteration  = 5000
+snapshot_iteration = 1000
+start_iteration    = 1
 test_iteration     = 100
 test_step          = 10
-model_pre_trained  = 
+model_pre_trained  = model/msnet_wt32cr_init
 model_save_prefix  = model/msnet_wt32cr

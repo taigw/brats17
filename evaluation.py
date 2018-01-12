@@ -12,7 +12,7 @@ def dice_of_brats_data_set(s_folder, g_folder, patient_names_file, type_idx):
     dice_all_data = []
     for i in range(len(patient_names)):
         s_name = os.path.join(s_folder, patient_names[i] + '.nii.gz')
-        g_name = os.path.join(g_folder, patient_names[i] + '_seg.nii.gz')
+        g_name = os.path.join(g_folder, patient_names[i] + '.nii.gz')
         s_volume = load_nifty_volume_as_array(s_name)
         g_volume = load_nifty_volume_as_array(g_name)
         dice_one_volume = []
@@ -25,16 +25,16 @@ def dice_of_brats_data_set(s_folder, g_folder, patient_names_file, type_idx):
             temp_dice = binary_dice3d(s_volume > 0, g_volume > 0)
             dice_one_volume = [temp_dice]
         else:
-            for label in [1, 2, 4]: # dice of each class
+            for label in [1, 2, 3, 4]: # dice of each class
                 temp_dice = binary_dice3d(s_volume == label, g_volume == label)
                 dice_one_volume.append(temp_dice)
         dice_all_data.append(dice_one_volume)
     return dice_all_data
     
 if __name__ == '__main__':
-    s_folder = 'results'
-    g_folder = 'data/Brats17TrainingData_crop_renamed'
-    patient_names_file = 'config/test_names_example.txt'
+    s_folder = 'result'
+    g_folder = '/home/guotai/data/brats_docker_data/pre_process'
+    patient_names_file = 'config_part/test_names.txt'
     test_types = ['whole','core', 'all']
     for type_idx in range(3):
         dice = dice_of_brats_data_set(s_folder, g_folder, patient_names_file, type_idx)
@@ -47,7 +47,7 @@ if __name__ == '__main__':
         np.savetxt(s_folder + '/dice_{0:}_std.txt'.format(test_type), dice_std)
         print('tissue type', test_type)
         if(test_type == 'all'):
-            print('tissue label', [1, 2, 4])
+            print('tissue label', [1, 2, 3, 4])
         print('dice mean  ', dice_mean)
         print('dice std   ', dice_std)
  

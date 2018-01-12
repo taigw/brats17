@@ -292,7 +292,7 @@ def test(config_file):
     
     # 5, start to test
     test_slice_direction = config_test.get('test_slice_direction', 'all')
-    save_folder = config_test['save_folder']
+    save_folder = config_data['save_folder']
     test_time = []
     struct = ndimage.generate_binary_structure(3, 2)
     margin = config_test.get('roi_patch_margin', 5)
@@ -420,14 +420,15 @@ def test(config_file):
             label1 = (label1 + label2_3_mask) > 0
             label2 = label2_3_mask
             label3 = label2 * label3
-            vox_3  = label3.sum() 
+            vox_3  = np.asarray(label3 > 0, np.float32).sum()
             if(0 < vox_3 and vox_3 < 30):
                 print('ignored voxel number ', vox_3)
                 label3 = np.zeros_like(label2)
 
             out_label = label1 * 2 
-            out_label[label2>0] = 1
-            out_label[label3>0] = 3
+            out_label[label2>0] = 3
+            out_label[label3==1] = 1
+            out_label[label3==2] = 4
             out_label = np.asarray(out_label, np.int16)
 
             # 5.5, convert label and save output

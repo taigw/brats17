@@ -3,6 +3,7 @@ import nibabel
 import numpy as np
 import random
 from scipy import ndimage
+import SimpleITK as sitk
 
 def search_file_in_folder_list(folder_list, file_name):
     """
@@ -22,6 +23,18 @@ def search_file_in_folder_list(folder_list, file_name):
     if(file_exist == False):
         raise ValueError('{0:} is not found in {1:}'.format(file_name, folder))
     return full_file_name
+
+def load_3d_volume_as_array(filename):
+    if('.nii' in filename):
+        return load_nifty_volume_as_array(filename)
+    elif('.mha' in filename):
+        return load_mha_volume_as_array(filename)
+    raise ValueError('{0:} unspported file format'.format(filename))
+
+def load_mha_volume_as_array(filename):
+    img = sitk.ReadImage(filename)
+    nda = sitk.GetArrayFromImage(img)
+    return nda
 
 def load_nifty_volume_as_array(filename):
     """
