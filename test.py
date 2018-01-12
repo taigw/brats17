@@ -450,11 +450,11 @@ def test(config_file):
     sess.close()
       
 if __name__ == '__main__':
-    if(len(sys.argv) != 2):
-        print('Number of arguments should be 2. e.g.')
-        print('    python test.py config.txt')
-        exit()
-    config_file = str(sys.argv[1])
+#    if(len(sys.argv) != 2):
+#        print('Number of arguments should be 2. e.g.')
+#        print('    python test.py config.txt')
+#        exit()
+    config_file = './test_data.txt'
     assert(os.path.isfile(config_file))
     test(config_file)
     
