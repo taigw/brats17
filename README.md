@@ -93,3 +93,6 @@ Calcuate dice scores between segmentation and the ground truth, run:
 python util/evaluation.py
 ```
 You may need to edit this file to  specify folders for segmentation and ground truth. 
+
+# Copyright
+* Copyright (c) 2017-2018, University College London. All rights reserved.

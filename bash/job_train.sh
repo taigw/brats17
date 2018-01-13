@@ -6,7 +6,7 @@
 ##$ -l h=tesla5
 #$ -N msnet_wt
 #$ -S /bin/bash
-#$ -wd /home/guotwang/tf_project/brats17_docker/brats17
+#$ -wd /home/guotwang/tf_project/brats17
 #!/bin/bash
 # The lines above are resource requests. This script has requested 1 Titan X (Pascal) GPU for 24 hours, and 11.5 GB of memory to be started with the BASH Shell.
 # More information about resource requests can be found at http://hpc.cs.ucl.ac.uk/job_submission_sge/
@@ -21,4 +21,4 @@ fi
 # These lines runs your NiftyNet task with the correct library paths for tensorflow
 TF_LD_LIBRARY_PATH=/share/apps/libc6_2.17/lib/x86_64-linux-gnu/:/share/apps/libc6_2.17/usr/lib64/:/share/apps/gcc-6.2.0/lib64:/share/apps/gcc-6.2.0/lib:/share/apps/python-3.6.0-shared/lib:/share/apps/cuda-8.0/lib64:/share/apps/cuda-8.0/extras/CUPTI/lib64:$LD_LIBRARY_PATH
 export PYTHONPATH="${PYTHONPATH}:/home/guotwang/tf_project/niftynet_src/NiftyNet"
-/share/apps/libc6_2.17/lib/x86_64-linux-gnu/ld-2.17.so --library-path $TF_LD_LIBRARY_PATH $(command -v /home/guotwang/miniconda3/bin/python3) /home/guotwang/tf_project/brats1517/brats17/train.py  /home/guotwang/tf_project/brats1517/brats17/config17/train_wt_ax.txt
+/share/apps/libc6_2.17/lib/x86_64-linux-gnu/ld-2.17.so --library-path $TF_LD_LIBRARY_PATH $(command -v /home/guotwang/miniconda3/bin/python3) /home/guotwang/tf_project/brats17/train.py  /home/guotwang/tf_project/brats17/config17/train_wt_ax.txt
