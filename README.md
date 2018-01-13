@@ -78,7 +78,7 @@ python train.py config17/train_en_cr.txt
 python util/rename_variables.py
 ```
 
-You may need to edit this file to set different parameters. As an example for Brats 2015, after running this command, you will see a model named `model15/msnet_tc32sg_init` that is copied from `model15/msnet_tc32_20000.ckpt`. Then just set start_iteration=1 and model_pre_trained=model15/msnet_tc32sg_init in `config15/train_tc_sg.txt`. 
+You may need to edit this file to set different parameters. As an example for Brats 2015, after running this command, you will see a model named `model15/msnet_tc32sg_init` that is copied from `model15/msnet_tc32_20000.ckpt`. Then just set **start_iteration=1** and **model_pre_trained=model15/msnet_tc32sg_init** in `config15/train_tc_sg.txt`. 
 
 ## 4, How to test
 Similar to 'Use pre-trained models', write a configure file that is similar to `config15/test_all_class.txt` or `config17/test_all_class.txt` and 
