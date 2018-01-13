@@ -79,6 +79,76 @@ def itensity_normalize_one_volume(volume):
     out[volume == 0] = out_random[volume == 0]
     return out
 
+def get_ND_bounding_box(label, margin):
+    """
+    get the bounding box of the non-zero region of an ND volume
+    """
+    input_shape = label.shape
+    if(type(margin) is int ):
+        margin = [margin]*len(input_shape)
+    assert(len(input_shape) == len(margin))
+    indxes = np.nonzero(label)
+    idx_min = []
+    idx_max = []
+    for i in range(len(input_shape)):
+        idx_min.append(indxes[i].min())
+        idx_max.append(indxes[i].max())
+
+    for i in range(len(input_shape)):
+        idx_min[i] = max(idx_min[i] - margin[i], 0)
+        idx_max[i] = min(idx_max[i] + margin[i], input_shape[i] - 1)
+    return idx_min, idx_max
+
+def crop_ND_volume_with_bounding_box(volume, min_idx, max_idx):
+    """
+    crop/extract a subregion form an nd image.
+    """
+    dim = len(volume.shape)
+    assert(dim >= 2 and dim <= 5)
+    if(dim == 2):
+        output = volume[np.ix_(range(min_idx[0], max_idx[0] + 1),
+                               range(min_idx[1], max_idx[1] + 1))]
+    elif(dim == 3):
+        output = volume[np.ix_(range(min_idx[0], max_idx[0] + 1),
+                               range(min_idx[1], max_idx[1] + 1),
+                               range(min_idx[2], max_idx[2] + 1))]
+    elif(dim == 4):
+        output = volume[np.ix_(range(min_idx[0], max_idx[0] + 1),
+                               range(min_idx[1], max_idx[1] + 1),
+                               range(min_idx[2], max_idx[2] + 1),
+                               range(min_idx[3], max_idx[3] + 1))]
+    elif(dim == 5):
+        output = volume[np.ix_(range(min_idx[0], max_idx[0] + 1),
+                               range(min_idx[1], max_idx[1] + 1),
+                               range(min_idx[2], max_idx[2] + 1),
+                               range(min_idx[3], max_idx[3] + 1),
+                               range(min_idx[4], max_idx[4] + 1))]
+    else:
+        raise ValueError("the dimension number shoud be 2 to 5")
+    return output
+
+def set_ND_volume_roi_with_bounding_box_range(volume, bb_min, bb_max, sub_volume):
+    """
+    set a subregion to an nd image.
+    """
+    dim = len(bb_min)
+    out = volume
+    if(dim == 2):
+        out[np.ix_(range(bb_min[0], bb_max[0] + 1),
+                   range(bb_min[1], bb_max[1] + 1))] = sub_volume
+    elif(dim == 3):
+        out[np.ix_(range(bb_min[0], bb_max[0] + 1),
+                   range(bb_min[1], bb_max[1] + 1),
+                   range(bb_min[2], bb_max[2] + 1))] = sub_volume
+    elif(dim == 4):
+        out[np.ix_(range(bb_min[0], bb_max[0] + 1),
+                   range(bb_min[1], bb_max[1] + 1),
+                   range(bb_min[2], bb_max[2] + 1),
+                   range(bb_min[3], bb_max[3] + 1))] = sub_volume
+    else:
+        raise ValueError("array dimension should be 2, 3 or 4")
+    return out
+
 def convert_label(in_volume, label_convert_source, label_convert_target):
     """
     convert the label value in a volume
@@ -245,26 +315,6 @@ def set_roi_to_volume(volume, center, sub_volume):
         raise ValueError("array dimension should be 3 or 4")        
     return output_volume  
 
-
-def get_roi(volume, margin):
-    """
-    get the roi bounding box of a 3D volume
-    inputs:
-        volume: the input 3D volume
-        margin: an integer margin along each axis
-    output:
-        [mind, maxd, minh, maxh, minw, maxw]: a list of lower and upper bound along each dimension
-    """
-    [d_idxes, h_idxes, w_idxes] = np.nonzero(volume)
-    [D, H, W] = volume.shape
-    mind = max(d_idxes.min() - margin, 0)
-    maxd = min(d_idxes.max() + margin, D)
-    minh = max(h_idxes.min() - margin, 0)
-    maxh = min(h_idxes.max() + margin, H)
-    minw = max(w_idxes.min() - margin, 0)
-    maxw = min(w_idxes.max() + margin, W)   
-    return [mind, maxd, minh, maxh, minw, maxw]
-
 def get_largest_two_component(img, print_info = False, threshold = None):
     """
     Get the largest two components of a binary volume
@@ -357,5 +407,5 @@ def binary_dice3d(s,g):
     s0 = prod.sum()
     s1 = s.sum()
     s2 = g.sum()
-    dice = 2.0*s0/(s1 + s2 + 1e-10)
+    dice = (2.0*s0 + 1e-10)/(s1 + s2 + 1e-10)
     return dice

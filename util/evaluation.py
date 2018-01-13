@@ -2,19 +2,49 @@
 from __future__ import absolute_import, print_function
 import os
 import sys
+sys.path.append('./')
 import numpy as np
-from util.data_process import load_nifty_volume_as_array, binary_dice3d
+from util.data_process import load_3d_volume_as_array, binary_dice3d
 
-def dice_of_brats_data_set(s_folder, g_folder, patient_names_file, type_idx):
+def get_ground_truth_names(g_folder, patient_names_file, year = 15):
+    assert(year==15 or year == 17)
     with open(patient_names_file) as f:
             content = f.readlines()
-            patient_names = [x.strip() for x in content] 
+            patient_names = [x.strip() for x in content]
+    full_gt_names = []
+    for patient_name in patient_names:
+        patient_dir = os.path.join(g_folder, patient_name)
+        img_names   = os.listdir(patient_dir)
+        gt_name = None
+        for img_name in img_names:
+            if(year == 15):
+                if 'OT.' in img_name:
+                    gt_name = img_name + '/' + img_name + '.mha'
+                    break
+            else:
+                if 'seg.' in img_name:
+                    gt_name = img_name
+                    break
+        gt_name = os.path.join(patient_dir, gt_name)
+        full_gt_names.append(gt_name)
+    return full_gt_names
+
+def get_segmentation_names(seg_folder, patient_names_file):
+    with open(patient_names_file) as f:
+            content = f.readlines()
+            patient_names = [x.strip() for x in content]
+    full_seg_names = []
+    for patient_name in patient_names:
+        seg_name = os.path.join(seg_folder, patient_name + '.nii.gz')
+        full_seg_names.append(seg_name)
+    return full_seg_names
+
+def dice_of_brats_data_set(gt_names, seg_names, type_idx):
+    assert(len(gt_names) == len(seg_names))
     dice_all_data = []
-    for i in range(len(patient_names)):
-        s_name = os.path.join(s_folder, patient_names[i] + '.nii.gz')
-        g_name = os.path.join(g_folder, patient_names[i] + '.nii.gz')
-        s_volume = load_nifty_volume_as_array(s_name)
-        g_volume = load_nifty_volume_as_array(g_name)
+    for i in range(len(gt_names)):
+        g_volume = load_3d_volume_as_array(gt_names[i])
+        s_volume = load_3d_volume_as_array(seg_names[i])
         dice_one_volume = []
         if(type_idx ==0): # whole tumor
             temp_dice = binary_dice3d(s_volume > 0, g_volume > 0)
@@ -32,12 +62,22 @@ def dice_of_brats_data_set(s_folder, g_folder, patient_names_file, type_idx):
     return dice_all_data
     
 if __name__ == '__main__':
-    s_folder = 'result'
-    g_folder = '/home/guotai/data/brats_docker_data/pre_process'
-    patient_names_file = 'config_part/test_names.txt'
+    year = 15 # or 17
+    
+    if(year == 15):
+        s_folder = 'result15'
+        g_folder = '/home/guotwang/data/BRATS2015_Training'
+        patient_names_file = 'config15/test_names.txt'
+    else:
+        s_folder = 'result17'
+        g_folder = '/home/guotwang/data/Brats17TrainingData'
+        patient_names_file = 'config15/test_names.txt'
+
     test_types = ['whole','core', 'all']
+    gt_names  = get_ground_truth_names(g_folder, patient_names_file, year)
+    seg_names = get_segmentation_names(s_folder, patient_names_file)
     for type_idx in range(3):
-        dice = dice_of_brats_data_set(s_folder, g_folder, patient_names_file, type_idx)
+        dice = dice_of_brats_data_set(gt_names, seg_names, type_idx)
         dice = np.asarray(dice)
         dice_mean = dice.mean(axis = 0)
         dice_std  = dice.std(axis  = 0)

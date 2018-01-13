@@ -298,13 +298,8 @@ def test(config_file):
     margin = config_test.get('roi_patch_margin', 5)
     
     for i in range(image_num):
-        [imgs, weight, temp_name] = dataloader.get_image_data_with_name(i)
+        [temp_imgs, temp_weight, temp_name, temp_bbox, temp_size] = dataloader.get_image_data_with_name(i)
         t0 = time.time()
-        groi = get_roi(weight > 0, margin)
-        temp_imgs = [x[np.ix_(range(groi[0], groi[1]), range(groi[2], groi[3]), range(groi[4], groi[5]))] \
-                        for x in imgs]
-        temp_weight = weight[np.ix_(range(groi[0], groi[1]), range(groi[2], groi[3]), range(groi[4], groi[5]))]
-        
         # 5.1, test of 1st network
         if(config_net1):
             data_shapes  = [ data_shape1[:-1],  data_shape1[:-1],  data_shape1[:-1]]
@@ -328,20 +323,20 @@ def test(config_file):
         wt_threshold = 2000
         if(config_test.get('whole_tumor_only', False) is True):
             pred1_lc = ndimage.morphology.binary_closing(pred1, structure = struct)
-            pred1_lc = get_largest_two_component(pred1_lc, True, wt_threshold)
+            pred1_lc = get_largest_two_component(pred1_lc, False, wt_threshold)
             out_label = pred1_lc
         else:
             # 5.2, test of 2nd network
             if(pred1.sum() == 0):
                 print('net1 output is null', temp_name)
-                roi2 = get_roi(temp_imgs[0] > 0, margin)
+                bbox1 = get_ND_bounding_box(temp_imgs[0] > 0, margin)
             else:
                 pred1_lc = ndimage.morphology.binary_closing(pred1, structure = struct)
-                pred1_lc = get_largest_two_component(pred1_lc, True, wt_threshold)
-                roi2 = get_roi(pred1_lc, margin)
-            sub_imgs = [x[np.ix_(range(roi2[0], roi2[1]), range(roi2[2], roi2[3]), range(roi2[4], roi2[5]))] \
-                          for x in temp_imgs]
-            sub_weight = temp_weight[np.ix_(range(roi2[0], roi2[1]), range(roi2[2], roi2[3]), range(roi2[4], roi2[5]))]
+                pred1_lc = get_largest_two_component(pred1_lc, False, wt_threshold)
+                bbox1 = get_ND_bounding_box(pred1_lc, margin)
+            sub_imgs = [crop_ND_volume_with_bounding_box(one_img, bbox1[0], bbox1[1]) for one_img in temp_imgs]
+            sub_weight = crop_ND_volume_with_bounding_box(temp_weight, bbox1[0], bbox1[1])
+
             if(config_net2):
                 data_shapes  = [ data_shape2[:-1],  data_shape2[:-1],  data_shape2[:-1]]
                 label_shapes = [label_shape2[:-1], label_shape2[:-1], label_shape2[:-1]]
@@ -364,17 +359,16 @@ def test(config_file):
             # 5.3, test of 3rd network
             if(pred2.sum() == 0):
                 [roid, roih, roiw] = sub_imgs[0].shape
-                roi3 = [0, roid, 0, roih, 0, roiw]
+                bbox2 = [[0,0,0], [roid-1, roih-1, roiw-1]]
                 subsub_imgs = sub_imgs
                 subsub_weight = sub_weight
             else:
                 pred2_lc = ndimage.morphology.binary_closing(pred2, structure = struct)
                 pred2_lc = get_largest_two_component(pred2_lc)
-                roi3 = get_roi(pred2_lc, margin)
-                subsub_imgs = [x[np.ix_(range(roi3[0], roi3[1]), range(roi3[2], roi3[3]), range(roi3[4], roi3[5]))] \
-                          for x in sub_imgs]
-                subsub_weight = sub_weight[np.ix_(range(roi3[0], roi3[1]), range(roi3[2], roi3[3]), range(roi3[4], roi3[5]))] 
-            
+                bbox2 = get_ND_bounding_box(pred2_lc, margin)
+                subsub_imgs = [crop_ND_volume_with_bounding_box(one_img, bbox2[0], bbox2[1]) for one_img in sub_imgs]
+                subsub_weight = crop_ND_volume_with_bounding_box(sub_weight, bbox2[0], bbox2[1])
+
             if(config_net3):
                 data_shapes  = [ data_shape3[:-1],  data_shape3[:-1],  data_shape3[:-1]]
                 label_shapes = [label_shape3[:-1], label_shape3[:-1], label_shape3[:-1]]
@@ -399,12 +393,12 @@ def test(config_file):
             # 5.4, fuse results at 3 levels
             # convert subsub_label to full size (non-enhanced)
             label3_roi = np.zeros_like(pred2)
-            label3_roi[np.ix_(range(roi3[0], roi3[1]), range(roi3[2], roi3[3]), range(roi3[4], roi3[5]))] = pred3
+            label3_roi = set_ND_volume_roi_with_bounding_box_range(label3_roi, bbox2[0], bbox2[1], pred3)
             label3 = np.zeros_like(pred1)
-            label3[np.ix_(range(roi2[0], roi2[1]), range(roi2[2], roi2[3]), range(roi2[4], roi2[5]))] = label3_roi
+            label3 = set_ND_volume_roi_with_bounding_box_range(label3, bbox1[0], bbox1[1], label3_roi)
 
             label2 = np.zeros_like(pred1)
-            label2[np.ix_(range(roi2[0], roi2[1]), range(roi2[2], roi2[3]), range(roi2[4], roi2[5]))] = pred2
+            lalbe2 = set_ND_volume_roi_with_bounding_box_range(label2, bbox1[0], bbox1[1], pred2)
 
             label1_mask = (pred1 + label2 + label3) > 0
             label1_mask = ndimage.morphology.binary_closing(label1_mask, structure = struct)
@@ -422,7 +416,6 @@ def test(config_file):
             label3 = label2 * label3
             vox_3  = np.asarray(label3 > 0, np.float32).sum()
             if(0 < vox_3 and vox_3 < 30):
-                print('ignored voxel number ', vox_3)
                 label3 = np.zeros_like(label2)
 
             # 5.5, convert label and save output
@@ -438,9 +431,8 @@ def test(config_file):
 
 
         test_time.append(time.time() - t0)
-        final_label = np.zeros_like(weight, np.int16)
-        final_label[np.ix_(range(groi[0], groi[1]), range(groi[2], groi[3]), range(groi[4], groi[5]))] = out_label
-
+        final_label = np.zeros(temp_size, np.int16)
+        final_label = set_ND_volume_roi_with_bounding_box_range(final_label, temp_bbox[0], temp_bbox[1], out_label)
         save_array_as_nifty_volume(final_label, save_folder+"/{0:}.nii.gz".format(temp_name))
         print(temp_name)
     test_time = np.asarray(test_time)

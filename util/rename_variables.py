@@ -20,13 +20,14 @@ def rename(checkpoint_from, checkpoint_to, replace_from, replace_to):
         saver.save(sess, checkpoint_to)
 
 if __name__ == '__main__':
+    year = 15
     net_name   = ['wt', 'tc', 'en']
     net_name_c = ['WT', 'TC', 'EN']
     num_pretrain = [10000, 20000, 20000]
     for i in range(3):
         for view in ['sg', 'cr']:
-            checkpoint_from = "model15/msnet_{0:}32_{1:}.ckpt".format(net_name[i], num_pretrain[i])
-            checkpoint_to   = "model15/msnet_{0:}32{1:}_init".format(net_name[i], view)
+            checkpoint_from = "model{0:}/msnet_{1:}32_{2:}.ckpt".format(year, net_name[i], num_pretrain[i])
+            checkpoint_to   = "model{0:}/msnet_{1:}32{2:}_init".format(year, net_name[i], view)
             replace_from   = "MSNet_{0:}32".format(net_name_c[i])
             replace_to     = "MSNet_{0:}32{1:}".format(net_name_c[i], view)
             rename(checkpoint_from, checkpoint_to, replace_from, replace_to)

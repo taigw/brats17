@@ -72,7 +72,7 @@ class DataLoader():
         volume = load_3d_volume_as_array(volume_name)
         return volume
 
-    def load_data(self, stage='train'):
+    def load_data(self):
         """
         load all the training/testing data
         """
@@ -81,22 +81,20 @@ class DataLoader():
         X = []
         W = []
         Y = []
+        bbox  = []
+        in_size = []
         data_num = self.data_num if (self.data_num is not None) else len(self.patient_names)
         for i in range(data_num):
             volume_list = []
             for mod_idx in range(len(self.modality_postfix)):
                 volume = self.__load_one_volume(self.patient_names[i], self.modality_postfix[mod_idx])
-                if(self.data_resize):
-                    volume = resize_3D_volume_to_given_shape(volume, self.data_resize, 1)
                 if(mod_idx == 0):
                     margin = 5
-                    [d_idxes, h_idxes, w_idxes] = np.nonzero(volume)
-                    mind = d_idxes.min() - margin; maxd = d_idxes.max() + margin
-                    minh = h_idxes.min() - margin; maxh = h_idxes.max() + margin
-                    minw = w_idxes.min() - margin; maxw = w_idxes.max() + margin
-                
-                if(stage == 'train'):
-                    volume = volume[np.ix_(range(mind, maxd), range(minh, maxh), range(minw, maxw))]
+                    bbmin, bbmax = get_ND_bounding_box(volume, margin)
+                    volume_size  = volume.shape
+                volume = crop_ND_volume_with_bounding_box(volume, bbmin, bbmax)
+                if(self.data_resize):
+                    volume = resize_3D_volume_to_given_shape(volume, self.data_resize, 1)
                 if(mod_idx ==0):
                     weight = np.asarray(volume > 0, np.float32)
                 if(self.intensity_normalize[mod_idx]):
@@ -104,18 +102,21 @@ class DataLoader():
                 volume_list.append(volume)
             X.append(volume_list)
             W.append(weight)
+            bbox.append([bbmin, bbmax])
+            in_size.append(volume_size)
             if(self.with_ground_truth):
                 label = self.__load_one_volume(self.patient_names[i], self.label_postfix)
+                label = crop_ND_volume_with_bounding_box(label, bbmin, bbmax)
                 if(self.data_resize):
                     label = resize_3D_volume_to_given_shape(label, self.data_resize, 0)
-                if(stage == 'train'):
-                    label = label[np.ix_(range(mind, maxd), range(minh, maxh), range(minw, maxw))]
                 Y.append(label)
             if((i+1)%50 == 0 or (i+1) == data_num):
                 print('Data load, {0:}% finished'.format((i+1)*100.0/data_num))
         self.data   = X
         self.weight = W
         self.label  = Y
+        self.bbox   = bbox
+        self.in_size= in_size
     
     def get_subimage_batch(self):
         """
@@ -256,4 +257,4 @@ class DataLoader():
         """
         Used for testing, get one image data and patient name
         """
-        return [self.data[i], self.weight[i], self.patient_names[i]]
+        return [self.data[i], self.weight[i], self.patient_names[i], self.bbox[i], self.in_size[i]]
