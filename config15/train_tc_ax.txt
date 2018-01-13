@@ -1,0 +1,32 @@
+[data]
+data_root             = [/home/guotwang/data/brats_docker_data/pre_process]
+data_names            = config/train_names_all_lggx3.txt 
+modality_postfix      = [Flair, T1, T1c, T2]
+label_postfix         = OT 
+with_ground_truth     = True
+batch_size            = 5
+data_shape            = [19, 96, 96, 4]
+label_shape           = [11, 96, 96, 1]
+label_convert_source  = [0, 1, 2, 3, 4]
+label_convert_target  = [0, 1, 0, 1, 1]
+batch_slice_direction = axial
+train_with_roi_patch  = True
+label_roi_mask        = [1,2,3,4]
+roi_patch_margin      = 5
+
+[network]
+net_type            = MSNet
+net_name            = MSNet_TC32
+downsample_twice    = True
+class_num           = 2
+
+[training]
+learning_rate      = 1e-3
+decay              = 1e-7
+maximal_iteration  = 20000
+snapshot_iteration = 5000
+start_iteration    = 0
+test_iteration     = 100
+test_step          = 10
+model_pre_trained  = 
+model_save_prefix  = model/msnet_tc32
