@@ -30,7 +30,7 @@ pip install niftynet
 
 # How to use
 ## 1, Prepare data
-* Download BraTS dataset, and uncompress the training and tesing zip files. For example, the training set will be in `data_root/BRATS2015_Training` or `data_root/Brats17TrainingData` and the validation set will be in `data_root/BRATS2015_Validation`.
+* Download BraTS dataset, and uncompress the training and tesing zip files. For example, the training set will be in `data_root/BRATS2015_Training` or `data_root/Brats17TrainingData` and the validation set will be in `data_root/BRATS2015_Validation` or `data_root/Brats17ValidationData`.
 
 ## 2, Use pre-trained models to segment images
 * To segment BraTS 2015 data, run:
@@ -73,10 +73,12 @@ python train.py config17/train_en_cr.txt
 ```
 
 * To save the time for training, you may use the modals in axial view as initalizations for sagittal and coronal views. Copy variales in axial view to those in sagittal or coronal view by running:
+
 ```bash
 python util/rename_variables.py
 ```
-You may need to edit this file to set different parameters. As an example for Brats 2015, after running this command, you will see a model named `model15/msnet_tc32sg_init` that is copied from `model15/msnet_tc32_20000.ckpt`. Then just set `start_iteration=1` and `model_pre_trained=model15/msnet_tc32sg_init` in `config15/train_tc_sg.txt`. 
+
+You may need to edit this file to set different parameters. As an example for Brats 2015, after running this command, you will see a model named `model15/msnet_tc32sg_init` that is copied from `model15/msnet_tc32_20000.ckpt`. Then just set start_iteration=1 and model_pre_trained=model15/msnet_tc32sg_init in `config15/train_tc_sg.txt`. 
 
 ## 4, How to test
 Similar to 'Use pre-trained models', write a configure file that is similar to `config15/test_all_class.txt` or `config17/test_all_class.txt` and 
