@@ -1,7 +1,9 @@
 [data]
-data_root         = [/home/guotwang/data/brats_docker_data/pre_process]
-data_names        = config/test_names.txt
+data_root         = /home/guotwang/data/BRATS2015_Training
+save_folder       = result15
+data_names        = config15/test_names.txt
 modality_postfix  = [Flair, T1, T1c, T2]
+file_postfix      = mha
 
 [network1ax]
 net_type            = MSNet
@@ -10,7 +12,7 @@ downsample_twice    = True
 data_shape          = [19, 180, 160, 4]
 label_shape         = [11, 180, 160, 1]
 class_num           = 2
-model_file          = model/msnet_wt32_10000.ckpt
+model_file          = model15/msnet_wt32_10000.ckpt
 
 [network1sg]
 net_type            = MSNet
@@ -19,7 +21,7 @@ downsample_twice    = True
 data_shape          = [19, 160, 180, 4]
 label_shape         = [11, 160, 180, 1]
 class_num           = 2
-model_file          = model/msnet_wt32sg_5000.ckpt
+model_file          = model15/msnet_wt32sg_5000.ckpt
 
 [network1cr]
 net_type            = MSNet
@@ -28,7 +30,7 @@ downsample_twice    = True
 data_shape          = [19, 160, 160, 4]
 label_shape         = [11, 160, 160, 1]
 class_num           = 2
-model_file          = model/msnet_wt32cr_5000.ckpt
+model_file          = model15/msnet_wt32cr_5000.ckpt
 
 
 [network2ax]
@@ -38,7 +40,7 @@ downsample_twice    = True
 data_shape          = [19, 96, 96, 4]
 label_shape         = [11, 96, 96, 1]
 class_num           = 2
-model_file          = model/msnet_tc32_20000.ckpt
+model_file          = model15/msnet_tc32_20000.ckpt
 
 [network2sg]
 net_type            = MSNet
@@ -47,7 +49,7 @@ downsample_twice    = True
 data_shape          = [19, 96, 96, 4]
 label_shape         = [11, 96, 96, 1]
 class_num           = 2
-model_file          = model/msnet_tc32sg_5000.ckpt
+model_file          = model15/msnet_tc32sg_5000.ckpt
 
 [network2cr]
 net_type            = MSNet
@@ -56,7 +58,7 @@ downsample_twice    = True
 data_shape          = [19, 96, 96, 4]
 label_shape         = [11, 96, 96, 1]
 class_num           = 2
-model_file          = model/msnet_tc32cr_5000.ckpt
+model_file          = model15/msnet_tc32cr_5000.ckpt
 
 [network3ax]
 net_type            = MSNet
@@ -65,7 +67,7 @@ downsample_twice    = False
 data_shape          = [19, 96, 96, 4]
 label_shape         = [11, 96, 96, 1]
 class_num           = 3
-model_file          = model/msnet_en32_20000.ckpt
+model_file          = model15/msnet_en32_20000.ckpt
 
 [network3sg]
 net_type            = MSNet
@@ -74,7 +76,7 @@ downsample_twice    = False
 data_shape          = [19, 96, 96, 4]
 label_shape         = [11, 96, 96, 1]
 class_num           = 3
-model_file          = model/msnet_en32sg_5000.ckpt
+model_file          = model15/msnet_en32sg_5000.ckpt
 
 [network3cr]
 net_type            = MSNet
@@ -83,8 +85,8 @@ downsample_twice    = False
 data_shape          = [19, 96, 96, 4]
 label_shape         = [11, 96, 96, 1]
 class_num           = 3
-model_file          = model/msnet_en32cr_5000.ckpt
+model_file          = model15/msnet_en32cr_5000.ckpt
 
 [testing]
 test_slice_direction = all
-save_folder = result_all
+

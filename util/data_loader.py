@@ -23,7 +23,7 @@ class DataLoader():
         self.label_convert_source = config.get('label_convert_source', None)
         self.label_convert_target = config.get('label_convert_target', None)
         self.label_postfix = config.get('label_postfix', 'seg')
-        self.file_postfix  = config.get('file_post_fix', 'nii.gz')
+        self.file_postfix  = config.get('file_postfix', 'nii.gz')
         self.data_names    = config.get('data_names', None)
         self.data_num      = config.get('data_num', None)
         self.data_resize   = config.get('data_resize', None)
@@ -37,60 +37,42 @@ class DataLoader():
         get the list of patient names, if self.data_names id not None, then load patient 
         names from that file, otherwise search all the names automatically in data_root
         """
-        if('.nii' in self.file_postfix):
-            if(self.data_names is not None):
-                assert(os.path.isfile(self.data_names))
-                with open(self.data_names) as f:
-                    content = f.readlines()
-                patient_names = [x.strip() for x in content] 
-            else: # load all image in data_root
-                sub_dirs = [x[0] for x in os.walk(self.data_root[0])]
-                patient_names = []
-                for sub_dir in sub_dirs:
-                    names = os.listdir(sub_dir)
-                    if(sub_dir == self.data_root[0]):
-                        sub_patient_names = []
-                        for x in names:
-                            if(self.file_postfix in x):
-                                idx = x.rfind('_')
-                                xsplit = x[:idx]
-                                sub_patient_names.append(xsplit)
-                    else:
-                        sub_dir_name = sub_dir[len(self.data_root[0])+1:]
-                        sub_patient_names = []
-                        for x in names:
-                            if(self.file_postfix in x):
-                                idx = x.rfind('_')
-                                xsplit = os.path.join(sub_dir_name,x[:idx])
-                                sub_patient_names.append(xsplit)                    
-                    sub_patient_names = list(set(sub_patient_names))
-                    sub_patient_names.sort()
-                    patient_names.extend(sub_patient_names)   
-    
+        # use pre-defined patient names
+        if(self.data_names is not None):
+            assert(os.path.isfile(self.data_names))
+            with open(self.data_names) as f:
+                content = f.readlines()
+            patient_names = [x.strip() for x in content]
+        # use all the patient names in data_root
         else:
             patient_names = os.listdir(self.data_root[0])
-            patient_names = [name for name in patient_names if 'brats' in name]
+            patient_names = [name for name in patient_names if 'brats' in name.lower()]
         return patient_names
 
     def __load_one_volume(self, patient_name, mod):
-        if('.nii' in self.file_postfix):
-            volume_name_short = patient_name + '_' + mod + '.' + self.file_postfix
-            volume_name = search_file_in_folder_list(self.data_root, volume_name_short)
-            volume = load_nifty_volume_as_array(volume_name)
+        patient_dir = os.path.join(self.data_root[0], patient_name)
+        # for bats17
+        if('nii' in self.file_postfix):
+            image_names = os.listdir(patient_dir)
+            volume_name = None
+            for image_name in image_names:
+                if(mod + '.' in image_name):
+                    volume_name = image_name
+                    break
+        # for brats15
         else:
-            patient_dir = os.path.join(self.data_root[0], patient_name)
             img_file_dirs = os.listdir(patient_dir)
             volume_name  = None
             for img_file_dir in img_file_dirs:
                 if(mod+'.' in img_file_dir):
                     volume_name = img_file_dir + '/' + img_file_dir + '.' + self.file_postfix
                     break
-            assert(volume_name is not None)
-            volume_name = os.path.join(patient_dir, volume_name)
-            volume = load_3d_volume_as_array(volume_name)
+        assert(volume_name is not None)
+        volume_name = os.path.join(patient_dir, volume_name)
+        volume = load_3d_volume_as_array(volume_name)
         return volume
 
-    def load_data(self):
+    def load_data(self, stage='train'):
         """
         load all the training/testing data
         """
@@ -107,6 +89,15 @@ class DataLoader():
                 if(self.data_resize):
                     volume = resize_3D_volume_to_given_shape(volume, self.data_resize, 1)
                 if(mod_idx == 0):
+                    margin = 5
+                    [d_idxes, h_idxes, w_idxes] = np.nonzero(volume)
+                    mind = d_idxes.min() - margin; maxd = d_idxes.max() + margin
+                    minh = h_idxes.min() - margin; maxh = h_idxes.max() + margin
+                    minw = w_idxes.min() - margin; maxw = w_idxes.max() + margin
+                
+                if(stage == 'train'):
+                    volume = volume[np.ix_(range(mind, maxd), range(minh, maxh), range(minw, maxw))]
+                if(mod_idx ==0):
                     weight = np.asarray(volume > 0, np.float32)
                 if(self.intensity_normalize[mod_idx]):
                     volume = itensity_normalize_one_volume(volume)
@@ -117,6 +108,8 @@ class DataLoader():
                 label = self.__load_one_volume(self.patient_names[i], self.label_postfix)
                 if(self.data_resize):
                     label = resize_3D_volume_to_given_shape(label, self.data_resize, 0)
+                if(stage == 'train'):
+                    label = label[np.ix_(range(mind, maxd), range(minh, maxh), range(minw, maxw))]
                 Y.append(label)
             if((i+1)%50 == 0 or (i+1) == data_num):
                 print('Data load, {0:}% finished'.format((i+1)*100.0/data_num))

@@ -1,8 +1,9 @@
 [data]
-data_root             = [/home/guotwang/data/brats_docker_data/pre_process]
-data_names            = config/train_names_all_lggx3.txt 
+data_root             = /home/guotwang/data/BRATS2015_Training
+data_names            = config15/train_names_all_lggx3.txt 
 modality_postfix      = [Flair, T1, T1c, T2]
 label_postfix         = OT 
+file_postfix          = mha
 with_ground_truth     = True
 batch_size            = 5
 data_shape            = [19, 96, 96, 4]
@@ -29,4 +30,4 @@ start_iteration    = 0
 test_iteration     = 100
 test_step          = 10
 model_pre_trained  = 
-model_save_prefix  = model/msnet_tc32
+model_save_prefix  = model15/msnet_tc32

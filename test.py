@@ -425,18 +425,17 @@ def test(config_file):
                 print('ignored voxel number ', vox_3)
                 label3 = np.zeros_like(label2)
 
-            out_label = label1 * 2 
-            out_label[label2>0] = 3
-            out_label[label3==1] = 1
-            out_label[label3==2] = 4
+            # 5.5, convert label and save output
+            out_label = label1 * 2
+            if('Flair' in config_data['modality_postfix'] and 'mha' in config_data['file_postfix']):
+                out_label[label2>0] = 3
+                out_label[label3==1] = 1
+                out_label[label3==2] = 4
+            elif('flair' in config_data['modality_postfix'] and 'nii' in config_data['file_postfix']):
+                out_label[label2>0] = 1
+                out_label[label3>0] = 4
             out_label = np.asarray(out_label, np.int16)
 
-            # 5.5, convert label and save output
-            label_convert_source = config_test.get('label_convert_source', None)
-            label_convert_target = config_test.get('label_convert_target', None)
-            if(label_convert_source and label_convert_target):
-                assert(len(label_convert_source) == len(label_convert_target))
-                out_label = convert_label(out_label, label_convert_source, label_convert_target)
 
         test_time.append(time.time() - t0)
         final_label = np.zeros_like(weight, np.int16)
@@ -450,11 +449,11 @@ def test(config_file):
     sess.close()
       
 if __name__ == '__main__':
-#    if(len(sys.argv) != 2):
-#        print('Number of arguments should be 2. e.g.')
-#        print('    python test.py config.txt')
-#        exit()
-    config_file = './test_data.txt'
+    if(len(sys.argv) != 2):
+        print('Number of arguments should be 2. e.g.')
+        print('    python test.py config.txt')
+        exit()
+    config_file = str(sys.argv[1])
     assert(os.path.isfile(config_file))
     test(config_file)
     

@@ -1,6 +1,9 @@
 [data]
-data_root             = [data/Brats17TrainingData_crop_renamed]
-data_names            = config/train_names_all.txt 
+data_root             = /home/guotwang/data/Brats17TrainingData
+data_names            = config17/train_names_all.txt
+modality_postfix      = [flair, t1, t1ce, t2]
+label_postfix         = seg
+file_postfix          = nii.gz
 with_ground_truth     = True
 batch_size            = 5
 data_shape            = [19, 144, 144, 4]
@@ -27,4 +30,4 @@ start_iteration    = 0
 test_iteration     = 100
 test_step          = 10
 model_pre_trained  = 
-model_save_prefix  = model/msnet_wt32sg
+model_save_prefix  = model17/msnet_wt32sg
