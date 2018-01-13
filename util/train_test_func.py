@@ -2,42 +2,7 @@
 from __future__ import absolute_import, print_function
 import tensorflow as tf
 import numpy as np
-from util.data_loader import \
-    extract_roi_from_volume, transpose_volumes, convert_label
-
-def set_roi_to_volume(volume, center, sub_volume):
-    volume_shape = volume.shape   
-    patch_shape = sub_volume.shape
-    output_volume = volume
-    for i in range(len(center)):
-        if(center[i] >= volume_shape[i]):
-            return output_volume
-    r0max = [int(x/2) for x in patch_shape]
-    r1max = [patch_shape[i] - r0max[i] for i in range(len(r0max))]
-    r0 = [min(r0max[i], center[i]) for i in range(len(r0max))]
-    r1 = [min(r1max[i], volume_shape[i] - center[i]) for i in range(len(r0max))]
-    patch_center = r0max
-
-    if(len(center) == 3):
-        output_volume[np.ix_(range(center[0] - r0[0], center[0] + r1[0]),
-                             range(center[1] - r0[1], center[1] + r1[1]),
-                             range(center[2] - r0[2], center[2] + r1[2]))] = \
-            sub_volume[np.ix_(range(patch_center[0] - r0[0], patch_center[0] + r1[0]),
-                              range(patch_center[1] - r0[1], patch_center[1] + r1[1]),
-                              range(patch_center[2] - r0[2], patch_center[2] + r1[2]))]
-    elif(len(center) == 4):
-        output_volume[np.ix_(range(center[0] - r0[0], center[0] + r1[0]),
-                             range(center[1] - r0[1], center[1] + r1[1]),
-                             range(center[2] - r0[2], center[2] + r1[2]),
-                             range(center[3] - r0[3], center[3] + r1[3]))] = \
-            sub_volume[np.ix_(range(patch_center[0] - r0[0], patch_center[0] + r1[0]),
-                              range(patch_center[1] - r0[1], patch_center[1] + r1[1]),
-                              range(patch_center[2] - r0[2], patch_center[2] + r1[2]),
-                              range(patch_center[3] - r0[3], patch_center[3] + r1[3]))]
-    else:
-        raise ValueError("array dimension should be 3 or 4")        
-    return output_volume  
-
+from util.data_process import *
 
 def volume_probability_prediction(temp_imgs, data_shape, label_shape, data_channel,
                                   class_num, batch_size, sess, proby, x):

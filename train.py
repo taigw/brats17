@@ -11,18 +11,17 @@ import tensorflow as tf
 from tensorflow.contrib.data import Iterator
 from tensorflow.contrib.layers.python.layers import regularizers
 from niftynet.layer.loss_segmentation import LossFunction
-from util.image_loader import *
+from util.data_loader import *
 from util.train_test_func import *
 from util.parse_config import parse_config
 from util.MSNet import MSNet
 
-
-import pickle
 class NetFactory(object):
     @staticmethod
     def create(name):
         if name == 'MSNet':
             return MSNet
+        # add your own networks here
         print('unsupported network:', name)
         exit()
 
@@ -70,13 +69,8 @@ def train(config_file):
     sess.run(tf.global_variables_initializer())  
     saver = tf.train.Saver()
     
-    loader = DataLoader(config_data)
-    train_data = loader.get_dataset('train', shuffle = True)
-    batch_per_epoch = loader.get_batch_per_epoch()
-    train_iterator = Iterator.from_structure(train_data.output_types,
-                                             train_data.output_shapes)
-    next_train_batch = train_iterator.get_next()
-    train_init_op  = train_iterator.make_initializer(train_data)
+    dataloader = DataLoader(config_data)
+    dataloader.load_data()
     
     # 4, start to train
     loss_file = config_train['model_save_prefix'] + "_loss.txt"
@@ -85,21 +79,27 @@ def train(config_file):
         saver.restore(sess, config_train['model_pre_trained'])
     loss_list, temp_loss_list = [], []
     for n in range(start_it, config_train['maximal_iteration']):
-        if((n-start_it)%batch_per_epoch == 0):
-            sess.run(train_init_op)
-        one_batch = sess.run(next_train_batch)
-        feed_dict = {x:one_batch['image'], w:one_batch['weight'], y:one_batch['label']}
-        opt_step.run(session = sess, feed_dict=feed_dict)
+        train_pair = dataloader.get_subimage_batch()
+        tempx = train_pair['images']
+        tempw = train_pair['weights']
+        tempy = train_pair['labels']
+        opt_step.run(session = sess, feed_dict={x:tempx, w: tempw, y:tempy})
 
-        loss_value = loss.eval(feed_dict = feed_dict)
-        temp_loss_list.append(loss_value)
-        if((n+1)%config_train['loss_display_iteration'] == 0):
-            avg_loss = np.asarray(temp_loss_list, np.float32).mean()
+        if(n%config_train['test_iteration'] == 0):
+            batch_dice_list = []
+            for step in range(config_train['test_step']):
+                train_pair = dataloader.get_subimage_batch()
+                tempx = train_pair['images']
+                tempw = train_pair['weights']
+                tempy = train_pair['labels']
+                dice = loss.eval(feed_dict ={x:tempx, w:tempw, y:tempy})
+                batch_dice_list.append(dice)
+            batch_dice = np.asarray(batch_dice_list, np.float32).mean()
             t = time.strftime('%X %x %Z')
-            print(t, 'iter', n+1,'loss', avg_loss)
-            loss_list.append(avg_loss)
+            print(t, 'n', n,'loss', batch_dice)
+            loss_list.append(batch_dice)
             np.savetxt(loss_file, np.asarray(loss_list))
-            temp_loss_list = []
+
         if((n+1)%config_train['snapshot_iteration']  == 0):
             saver.save(sess, config_train['model_save_prefix']+"_{0:}.ckpt".format(n+1))
     sess.close()

@@ -2,227 +2,42 @@
 from __future__ import absolute_import, print_function
 
 import os
-import numpy as np
-import nibabel
-from PIL import Image
 import random
+import nibabel
+import numpy as np
 from scipy import ndimage
-
-def search_file_in_folder_list(folder_list, file_name):
-    """
-    Find the full filename from a list of folders
-    inputs:
-        folder_list: a list of folders
-        file_name:  filename
-    outputs:
-        full_file_name: the full filename
-    """
-    file_exist = False
-    for folder in folder_list:
-        full_file_name = os.path.join(folder, file_name)
-        if(os.path.isfile(full_file_name)):
-            file_exist = True
-            break
-    if(file_exist == False):
-        raise ValueError('file not exist: {0:}'.format(file_name))
-    return full_file_name
-
-def load_nifty_volume_as_array(filename):
-    """
-    load nifty image into numpy array, and transpose it based on the [z,y,x] axis order
-    The output array shape is like [Depth, Height, Width]
-    inputs:
-        filename: the input file name, should be *.nii or *.nii.gz
-    outputs:
-        data: a numpy data array
-    """
-    img = nibabel.load(filename)
-    data = img.get_data()
-    data = np.transpose(data, [2,1,0])
-    return data
-
-def save_array_as_nifty_volume(data, filename):
-    """
-    save a numpy array as nifty image
-    inputs:
-        data: a numpy array with shape [Depth, Height, Width]
-        filename: the ouput file name
-    outputs: None
-    """
-    data = np.transpose(data, [2, 1, 0])
-    img = nibabel.Nifti1Image(data, np.eye(4))
-    nibabel.save(img, filename)
-
-def itensity_normalize_one_volume(volume):
-    """
-    normalize the itensity of an nd volume based on the mean and std of nonzeor region
-    inputs:
-        volume: the input nd volume
-    outputs:
-        out: the normalized nd volume
-    """
-    
-    pixels = volume[volume > 0]
-    mean = pixels.mean()
-    std  = pixels.std()
-    out = (volume - mean)/std
-    out_random = np.random.normal(0, 1, size = volume.shape)
-    out[volume == 0] = out_random[volume == 0]
-    return out
-
-def convert_label(in_volume, label_convert_source, label_convert_target):
-    """
-    convert the label value in a volume
-    inputs:
-        in_volume: input nd volume with label set label_convert_source
-        label_convert_source: a list of integers denoting input labels, e.g., [0, 1, 2, 4]
-        label_convert_target: a list of integers denoting output labels, e.g.,[0, 1, 2, 3]
-    outputs:
-        out_volume: the output nd volume with label set label_convert_target
-    """
-    mask_volume = np.zeros_like(in_volume)
-    convert_volume = np.zeros_like(in_volume)
-    for i in range(len(label_convert_source)):
-        source_lab = label_convert_source[i]
-        target_lab = label_convert_target[i]
-        if(source_lab != target_lab):
-            temp_source = np.asarray(in_volume == source_lab)
-            temp_target = target_lab * temp_source
-            mask_volume = mask_volume + temp_source
-            convert_volume = convert_volume + temp_target
-    out_volume = in_volume * 1
-    out_volume[mask_volume>0] = convert_volume[mask_volume>0]
-    return out_volume
-        
-def get_random_roi_sampling_center(input_shape, output_shape, sample_mode, bounding_box = None):
-    """
-    get a random coordinate representing the center of a roi for sampling
-    inputs:
-        input_shape: the shape of sampled volume
-        output_shape: the desired roi shape
-        sample_mode: 'full': the entire roi should be inside the input volume
-                     'valid': only the roi centre should be inside the input volume
-        bounding_box: the bounding box which the roi center should be limited to
-    outputs:
-        center: the output center coordinate of a roi
-    """
-    center = []
-    for i in range(len(input_shape)):
-        if(sample_mode[i] == 'full'):
-            if(bounding_box):
-                x0 = bounding_box[i*2]; x1 = bounding_box[i*2 + 1]
-            else:
-                x0 = 0; x1 = input_shape[i]
-        else:
-            if(bounding_box):
-                x0 = bounding_box[i*2] + int(output_shape[i]/2)   
-                x1 = bounding_box[i*2+1] - int(output_shape[i]/2)   
-            else:
-                x0 = int(output_shape[i]/2)   
-                x1 = input_shape[i] - x0
-        if(x1 <= x0):
-            centeri = int((x0 + x1)/2)
-        else:
-            centeri = random.randint(x0, x1)
-        center.append(centeri)
-    return center    
-
-def transpose_volumes(volumes, slice_direction):
-    """
-    transpose a list of volumes
-    inputs:
-        volumes: a list of nd volumes
-        slice_direction: 'axial', 'sagittal', or 'coronal'
-    outputs:
-        tr_volumes: a list of transposed volumes
-    """
-    if (slice_direction == 'axial'):
-        tr_volumes = volumes
-    elif(slice_direction == 'sagittal'):
-        tr_volumes = [np.transpose(x, (2, 0, 1)) for x in volumes]
-    elif(slice_direction == 'coronal'):
-        tr_volumes = [np.transpose(x, (1, 0, 2)) for x in volumes]
-    else:
-        print('undefined slice direction:', slice_direction)
-        tr_volumes = volumes
-    return tr_volumes
-
-
-def resize_ND_volume_to_given_shape(volume, out_shape, order = 3):
-    """
-    resize an nd volume to a given shape
-    inputs:
-        volume: the input nd volume, an nd array
-        out_shape: the desired output shape, a list
-        order: the order of interpolation
-    outputs:
-        out_volume: the reized nd volume with given shape
-    """
-    shape0=volume.shape
-    assert(len(shape0) == len(out_shape))
-    scale = [(out_shape[i] + 0.0)/shape0[i] for i in range(len(shape0))]
-    out_volume = ndimage.interpolation.zoom(volume, scale, order = order)
-    return out_volume
-
-def extract_roi_from_volume(volume, in_center, output_shape, fill = 'random'):
-    """
-    extract a roi from a 3d volume
-    inputs:
-        volume: the input 3D volume
-        in_center: the center of the roi
-        output_shape: the size of the roi
-        fill: 'random' or 'zero', the mode to fill roi region where is outside of the input volume
-    outputs:
-        output: the roi volume
-    """
-    input_shape = volume.shape   
-    if(fill == 'random'):
-        output = np.random.normal(0, 1, size = output_shape)
-    else:
-        output = np.zeros(output_shape)
-    r0max = [int(x/2) for x in output_shape]
-    r1max = [output_shape[i] - r0max[i] for i in range(len(r0max))]
-    r0 = [min(r0max[i], in_center[i]) for i in range(len(r0max))]
-    r1 = [min(r1max[i], input_shape[i] - in_center[i]) for i in range(len(r0max))]
-    out_center = r0max
-
-    output[np.ix_(range(out_center[0] - r0[0], out_center[0] + r1[0]),
-                  range(out_center[1] - r0[1], out_center[1] + r1[1]),
-                  range(out_center[2] - r0[2], out_center[2] + r1[2]))] = \
-        volume[np.ix_(range(in_center[0] - r0[0], in_center[0] + r1[0]),
-                      range(in_center[1] - r0[1], in_center[1] + r1[1]),
-                      range(in_center[2] - r0[2], in_center[2] + r1[2]))]
-    return output
+from util.data_process import *
 
 class DataLoader():
-    def __init__(self):
-        pass
-        
-    def set_params(self, config):
-        self.config = config
+    def __init__(self, config):
+        """
+        Initialize the calss instance
+        inputs:
+            config: a dictionary representing parameters
+        """
+        self.config    = config
         self.data_root = config['data_root']
-        self.modality_postfix = config['modality_postfix']
-        self.intensity_normalize = config.get('intensity_normalize', None)
-        self.label_postfix =  config.get('label_postfix', None)
-        self.file_postfix = config['file_post_fix']
-        self.data_names = config['data_names']
-        self.data_num = config.get('data_num', 0)
-        self.data_resize = config.get('data_resize', None)
-        self.with_ground_truth  = config.get('with_ground_truth', False)
-        self.with_flip = config.get('with_flip', False)
-        self.label_convert_source = self.config.get('label_convert_source', None)
-        self.label_convert_target = self.config.get('label_convert_target', None)
+        self.modality_postfix     = config.get('modality_postfix', ['flair','t1', 't1ce', 't2'])
+        self.intensity_normalize  = config.get('intensity_normalize', [True, True, True, True])
+        self.with_ground_truth    = config.get('with_ground_truth', False)
+        self.label_convert_source = config.get('label_convert_source', None)
+        self.label_convert_target = config.get('label_convert_target', None)
+        self.label_postfix = config.get('label_postfix', 'seg')
+        self.file_postfix  = config.get('file_post_fix', 'nii.gz')
+        self.data_names    = config.get('data_names', None)
+        self.data_num      = config.get('data_num', None)
+        self.data_resize   = config.get('data_resize', None)
+        self.with_flip     = config.get('with_flip', False)
+
         if(self.label_convert_source and self.label_convert_target):
             assert(len(self.label_convert_source) == len(self.label_convert_target))
-        if(self.intensity_normalize == None):
-            self.intensity_normalize = [True] * len(self.modality_postfix)
             
     def __get_patient_names(self):
         """
         get the list of patient names, if self.data_names id not None, then load patient 
-        names from that file, otherwise get search all the names automatically in data_root
+        names from that file, otherwise search all the names automatically in data_root
         """
-        if(self.data_names):
+        if(self.data_names is not None):
             assert(os.path.isfile(self.data_names))
             with open(self.data_names) as f:
                 content = f.readlines()
@@ -261,8 +76,7 @@ class DataLoader():
         X = []
         W = []
         Y = []
-        P = []
-        data_num = self.data_num if (self.data_num) else len(self.patient_names)
+        data_num = self.data_num if (self.data_num is not None) else len(self.patient_names)
         for i in range(data_num):
             volume_list = []
             for mod_idx in range(len(self.modality_postfix)):
@@ -285,8 +99,8 @@ class DataLoader():
                 if(self.data_resize):
                     label = resize_3D_volume_to_given_shape(label, self.data_resize, 0)
                 Y.append(label)
-            if(i%50 == 0 or i == data_num):
-                print('{0:}/{1:} volumes have been loaded'.format(i, data_num))
+            if((i+1)%50 == 0 or (i+1) == data_num):
+                print('Data load, {0:}% finished'.format((i+1)*100.0/data_num))
         self.data   = X
         self.weight = W
         self.label  = Y
@@ -318,13 +132,12 @@ class DataLoader():
         train_with_roi_patch = self.config.get('train_with_roi_patch', False)
         keep_roi_outside = self.config.get('keep_roi_outside', False)
         if(train_with_roi_patch):
-            label_roi_mask = self.config['label_roi_mask']
+            label_roi_mask    = self.config['label_roi_mask']
             roi_patch_margin  = self.config['roi_patch_margin']
 
         # return batch size: [batch_size, slice_num, slice_h, slice_w, moda_chnl]
         data_batch = []
         weight_batch = []
-        prob_batch = []
         label_batch = []
         slice_direction = batch_slice_direction
         if(slice_direction == 'random'):
@@ -414,17 +227,21 @@ class DataLoader():
         data_batch = np.asarray(data_batch, np.float32)
         weight_batch = np.asarray(weight_batch, np.float32)
         label_batch = np.asarray(label_batch, np.int64)
-        prob_batch = np.asarray(prob_batch, np.float32)
         batch = {}
-        batch['images']  = np.transpose(data_batch, [0, 2, 3, 4, 1])
+        batch['images']  = np.transpose(data_batch,   [0, 2, 3, 4, 1])
         batch['weights'] = np.transpose(weight_batch, [0, 2, 3, 4, 1])
-        batch['labels']  = np.transpose(label_batch, [0, 2, 3, 4, 1])
+        batch['labels']  = np.transpose(label_batch,  [0, 2, 3, 4, 1])
         
         return batch
     
-    # The following two functions are used for testing
     def get_total_image_number(self):
+        """
+        get the toal number of images
+        """
         return len(self.data)
     
     def get_image_data_with_name(self, i):
+        """
+        Used for testing, get one image data and patient name
+        """
         return [self.data[i], self.weight[i], self.patient_names[i]]

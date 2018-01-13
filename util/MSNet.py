@@ -33,8 +33,8 @@ class MSNet(TrainableLayer):
         self.downsample_twice = True
         
     def set_params(self, params):
-        self.base_chns = params['base_feature_number']
-        self.acti_func = params['acti_func']
+        self.base_chns = params.get('base_feature_number', [32, 32, 32, 32])
+        self.acti_func = params.get('acti_func', 'prelu')
         self.downsample_twice = params['downsample_twice']
         
     def layer_op(self, images, is_training):
@@ -402,31 +402,6 @@ class ResBlock(TrainableLayer):
             output_tensor = ElementwiseLayer('SUM')(output_tensor, input_tensor)
         return output_tensor
     
-    def layer_op_selu(self, input_tensor, is_training):
-        output_tensor = input_tensor
-        for i in range(len(self.kernels)):
-            # create parameterised layers
-#             bn_op = BNLayer(regularizer=self.regularizers['w'],
-#                             name='bn_{}'.format(i))
-            acti_op = ActiLayer(func=self.acti_func,
-                                regularizer=self.regularizers['w'],
-                                name='acti_{}'.format(i))
-            conv_op = ConvLayer(n_output_chns=self.n_output_chns,
-                                kernel_size=self.kernels[i],
-                                stride=self.strides[i],
-                                dilation=self.dilation_rates[i],
-                                w_initializer=self.initializers['w'],
-                                w_regularizer=self.regularizers['w'],
-                                name='conv_{}'.format(i))
-            # connect layers
-#             output_tensor = bn_op(output_tensor, is_training)
-            output_tensor = conv_op(output_tensor)
-            output_tensor = acti_op(output_tensor)
-            
-        # make residual connections
-        if self.with_res:
-            output_tensor = ElementwiseLayer('SUM')(output_tensor, input_tensor)
-        return output_tensor
 
 class TensorSliceLayer(TrainableLayer):
     """
