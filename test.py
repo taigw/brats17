@@ -443,7 +443,7 @@ def test(config_file):
 if __name__ == '__main__':
     if(len(sys.argv) != 2):
         print('Number of arguments should be 2. e.g.')
-        print('    python test.py config.txt')
+        print('    python test.py config17/test_all_class.txt')
         exit()
     config_file = str(sys.argv[1])
     assert(os.path.isfile(config_file))
