@@ -307,7 +307,7 @@ def test(config_file):
     margin = config_test.get('roi_patch_margin', 5)
     
     for i in range(image_num):
-        [temp_imgs, temp_weight, temp_name, temp_bbox, temp_size] = dataloader.get_image_data_with_name(i)
+        [temp_imgs, temp_weight, temp_name, img_names, temp_bbox, temp_size] = dataloader.get_image_data_with_name(i)
         t0 = time.time()
         # 5.1, test of 1st network
         if(config_net1):
@@ -442,7 +442,7 @@ def test(config_file):
         test_time.append(time.time() - t0)
         final_label = np.zeros(temp_size, np.int16)
         final_label = set_ND_volume_roi_with_bounding_box_range(final_label, temp_bbox[0], temp_bbox[1], out_label)
-        save_array_as_nifty_volume(final_label, save_folder+"/{0:}.nii.gz".format(temp_name))
+        save_array_as_nifty_volume(final_label, save_folder+"/{0:}.nii.gz".format(temp_name), img_names[0])
         print(temp_name)
     test_time = np.asarray(test_time)
     print('test time', test_time.mean())

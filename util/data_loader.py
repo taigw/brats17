@@ -79,7 +79,7 @@ class DataLoader():
         assert(volume_name is not None)
         volume_name = os.path.join(patient_dir, volume_name)
         volume = load_3d_volume_as_array(volume_name)
-        return volume
+        return volume, volume_name
 
     def load_data(self):
         """
@@ -87,6 +87,7 @@ class DataLoader():
         """
         self.patient_names = self.__get_patient_names()
         assert(len(self.patient_names)  > 0)
+        ImageNames = []
         X = []
         W = []
         Y = []
@@ -95,8 +96,9 @@ class DataLoader():
         data_num = self.data_num if (self.data_num is not None) else len(self.patient_names)
         for i in range(data_num):
             volume_list = []
+            volume_name_list = []
             for mod_idx in range(len(self.modality_postfix)):
-                volume = self.__load_one_volume(self.patient_names[i], self.modality_postfix[mod_idx])
+                volume, volume_name = self.__load_one_volume(self.patient_names[i], self.modality_postfix[mod_idx])
                 if(mod_idx == 0):
                     margin = 5
                     bbmin, bbmax = get_ND_bounding_box(volume, margin)
@@ -109,6 +111,8 @@ class DataLoader():
                 if(self.intensity_normalize[mod_idx]):
                     volume = itensity_normalize_one_volume(volume)
                 volume_list.append(volume)
+                volume_name_list.append(volume_name)
+            ImageNames.append(volume_name_list)
             X.append(volume_list)
             W.append(weight)
             bbox.append([bbmin, bbmax])
@@ -121,6 +125,7 @@ class DataLoader():
                 Y.append(label)
             if((i+1)%50 == 0 or (i+1) == data_num):
                 print('Data load, {0:}% finished'.format((i+1)*100.0/data_num))
+        self.image_names = ImageNames
         self.data   = X
         self.weight = W
         self.label  = Y
@@ -266,4 +271,4 @@ class DataLoader():
         """
         Used for testing, get one image data and patient name
         """
-        return [self.data[i], self.weight[i], self.patient_names[i], self.bbox[i], self.in_size[i]]
+        return [self.data[i], self.weight[i], self.patient_names[i], self.image_names[i], self.bbox[i], self.in_size[i]]
