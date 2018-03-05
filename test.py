@@ -407,7 +407,7 @@ def test(config_file):
             label3 = set_ND_volume_roi_with_bounding_box_range(label3, bbox1[0], bbox1[1], label3_roi)
 
             label2 = np.zeros_like(pred1)
-            lalbe2 = set_ND_volume_roi_with_bounding_box_range(label2, bbox1[0], bbox1[1], pred2)
+            label2 = set_ND_volume_roi_with_bounding_box_range(label2, bbox1[0], bbox1[1], pred2)
 
             label1_mask = (pred1 + label2 + label3) > 0
             label1_mask = ndimage.morphology.binary_closing(label1_mask, structure = struct)
