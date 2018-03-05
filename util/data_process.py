@@ -73,18 +73,11 @@ def save_array_as_nifty_volume(data, filename, reference_name = None):
         reference_name: file name of the reference image of which affine and header are used
     outputs: None
     """
-
-    data = np.transpose(data, [2, 1, 0])
-    if(reference_name is None):
-        affine = np.eye(4)
-        header = None
-        img = nibabel.Nifti1Image(data, affine, header)
-        nibabel.save(img, filename)
-    else:
+    img = sitk.GetImageFromArray(data)
+    if(reference_name is not None):
         img_ref = sitk.ReadImage(reference_name)
-        img = sitk.Image(data.shape[0], data.shape[1], data.shape[2], sitk.sitkInt16)
-        img.copyInformation(img_ref)
-        sitk.WriteImage(img, filename)
+        img.CopyInformation(img_ref)
+    sitk.WriteImage(img, filename)
 
 
 def itensity_normalize_one_volume(volume):
