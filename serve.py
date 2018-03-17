@@ -36,7 +36,7 @@ class Brats17(TOMAATService):
         [  # THIS defines the input interface of this service
             {'type': 'volume', 'destination': 'Flair'},  # FLAIR volume
             {'type': 'volume', 'destination': 'T1'},  # T1
-            {'type': 'volume', 'destination': 'T1ce'},  # T1ce
+            {'type': 'volume', 'destination': 'T1c'},  # T1c
             {'type': 'volume', 'destination': 'T2'},  # T2
         ]
 
@@ -275,7 +275,6 @@ class Brats17(TOMAATService):
             self.saver1.restore(self.sess, self.config_net1['model_file'])
         else:
             self.net1ax_vars = [x for x in self.all_vars if x.name[0:len(self.net_name1ax) + 1] == self.net_name1ax + '/']
-            print(self.net1ax_vars)
             self.saver1ax = tf.train.Saver(self.net1ax_vars)
             self.saver1ax.restore(self.sess, self.config_net1ax['model_file'])
             self.net1sg_vars = [x for x in self.all_vars if x.name[0:len(self.net_name1sg) + 1] == self.net_name1sg + '/']
@@ -344,7 +343,7 @@ class Brats17(TOMAATService):
             f.write(request.args['T1'][0])
 
         with open(tmp_filename_t1ce, 'wb') as f:
-            f.write(request.args['T1ce'][0])
+            f.write(request.args['T1c'][0])
 
         with open(tmp_filename_t2, 'wb') as f:
             f.write(request.args['T2'][0])
@@ -352,7 +351,7 @@ class Brats17(TOMAATService):
         data = {
             'flair': tmp_filename_flair,
             't1': tmp_filename_t1,
-            't1ce': tmp_filename_t1ce,
+            't1c': tmp_filename_t1ce,
             't2': tmp_filename_t2,
             'uids': uid,
         }
@@ -366,7 +365,7 @@ class Brats17(TOMAATService):
         image_num = dataloader.get_total_image_number()
 
         #dataloader = DataLoaderServing(self.config_data)
-        #dataloader.load_data([data['flair'], data['t1'], data['t1ce'], data['t2']])
+        #dataloader.load_data([data['flair'], data['t1'], data['t1c'], data['t2']])
         #image_num = dataloader.get_total_image_number()
 
         # 5, start to test
@@ -377,6 +376,7 @@ class Brats17(TOMAATService):
         margin = self.config_test.get('roi_patch_margin', 5)
 
         for i in range(image_num):
+            print('HELLO')
             [temp_imgs, temp_weight, temp_name, img_names, temp_bbox, temp_size] = \
                 dataloader.get_image_data_with_name(i)
 
@@ -399,6 +399,9 @@ class Brats17(TOMAATService):
             prob1 = test_one_image_three_nets_adaptive_shape(temp_imgs, data_shapes, label_shapes, self.data_shape1ax[-1],
                                                              class_num,
                                                              self.batch_size, self.sess, nets, outputs, inputs, shape_mode=2)
+
+            print('PORCODIO')
+
             pred1 = np.asarray(np.argmax(prob1, axis=3), np.uint16)
             pred1 = pred1 * temp_weight
 

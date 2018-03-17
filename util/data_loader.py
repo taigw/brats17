@@ -26,7 +26,7 @@ class DataLoader():
         """
         self.config    = config
         self.data_root = config['data_root'] if type(config['data_root']) is list else [config['data_root']]
-        self.modality_postfix     = config.get('modality_postfix', ['flair','t1', 't1ce', 't2'])
+        self.modality_postfix     = config.get('modality_postfix', ['flair','t1', 't1c', 't2'])
         self.intensity_normalize  = config.get('intensity_normalize', [True, True, True, True])
         self.with_ground_truth    = config.get('with_ground_truth', False)
         self.label_convert_source = config.get('label_convert_source', None)
