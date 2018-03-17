@@ -103,7 +103,6 @@ def test(config_file):
         predicty1cr = net1cr(x1cr, is_training = True)
         proby1cr = tf.nn.softmax(predicty1cr)
     
-    
     if(config_test.get('whole_tumor_only', False) is False):
         # 2.2, networks for tumor core
         if(config_net2):
@@ -248,7 +247,8 @@ def test(config_file):
     # 3, create session and load trained models
     all_vars = tf.global_variables()
     sess = tf.InteractiveSession()   
-    sess.run(tf.global_variables_initializer())  
+    sess.run(tf.global_variables_initializer())
+
     if(config_net1):
         net1_vars = [x for x in all_vars if x.name[0:len(net_name1) + 1]==net_name1 + '/']
         saver1 = tf.train.Saver(net1_vars)
@@ -296,6 +296,7 @@ def test(config_file):
             saver3cr.restore(sess, config_net3cr['model_file'])     
 
     # 4, load test images
+
     dataloader = DataLoader(config_data)
     dataloader.load_data()
     image_num = dataloader.get_total_image_number()

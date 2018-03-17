@@ -49,7 +49,7 @@ class Brats17(TOMAATService):
         self.config_net2 = self.config.get('network2', None)
         self.config_net3 = self.config.get('network3', None)
         self.config_test = self.config['testing']
-        self.batch_size = 1
+        self.batch_size = 32
 
         # 2.1, network for whole tumor
         if (self.config_net1):
@@ -82,12 +82,13 @@ class Brats17(TOMAATService):
 
             full_data_shape1ax = [self.batch_size] + self.data_shape1ax
             self.x1ax = tf.placeholder(tf.float32, shape=full_data_shape1ax)
-            net_class1ax = NetFactory.create(net_type1ax)
-            self.net1ax = net_class1ax(num_classes=self.class_num1ax, w_regularizer=None,
-                                  b_regularizer=None, name=net_name1ax)
+
+            self.net_class1ax = NetFactory.create(net_type1ax)
+            self.net1ax = self.net_class1ax(num_classes=self.class_num1ax, w_regularizer=None, b_regularizer=None, name=net_name1ax)
+
             self.net1ax.set_params(config_net1ax)
-            predicty1ax = self.net1ax(self.x1ax, is_training=True)
-            self.proby1ax = tf.nn.softmax(predicty1ax)
+            self.predicty1ax = self.net1ax(self.x1ax, is_training=True)
+            self.proby1ax = tf.nn.softmax(self.predicty1ax)
 
             # construct graph for 1st network sagittal
             net_type1sg = config_net1sg['net_type']
@@ -98,12 +99,13 @@ class Brats17(TOMAATService):
 
             full_data_shape1sg = [self.batch_size] + self.data_shape1sg
             self.x1sg = tf.placeholder(tf.float32, shape=full_data_shape1sg)
-            net_class1sg = NetFactory.create(net_type1sg)
-            self.net1sg = net_class1sg(num_classes=class_num1sg, w_regularizer=None,
-                                  b_regularizer=None, name=net_name1sg)
+
+            self.net_class1sg = NetFactory.create(net_type1sg)
+            self.net1sg = self.net_class1sg(num_classes=class_num1sg, w_regularizer=None, b_regularizer=None, name=net_name1sg)
+
             self.net1sg.set_params(config_net1sg)
-            predicty1sg = self.net1sg(self.x1sg, is_training=True)
-            self.proby1sg = tf.nn.softmax(predicty1sg)
+            self.predicty1sg = self.net1sg(self.x1sg, is_training=True)
+            self.proby1sg = tf.nn.softmax(self.predicty1sg)
 
             # construct graph for 1st network corogal
             net_type1cr = config_net1cr['net_type']
@@ -114,12 +116,13 @@ class Brats17(TOMAATService):
 
             full_data_shape1cr = [self.batch_size] + self.data_shape1cr
             self.x1cr = tf.placeholder(tf.float32, shape=full_data_shape1cr)
-            net_class1cr = NetFactory.create(net_type1cr)
-            self.net1cr = net_class1cr(num_classes=class_num1cr, w_regularizer=None,
-                                  b_regularizer=None, name=net_name1cr)
+
+            self.net_class1cr = NetFactory.create(net_type1cr)
+            self.net1cr = self.net_class1cr(num_classes=class_num1cr, w_regularizer=None, b_regularizer=None, name=net_name1cr)
+
             self.net1cr.set_params(config_net1cr)
-            predicty1cr = self.net1cr(self.x1cr, is_training=True)
-            self.proby1cr = tf.nn.softmax(predicty1cr)
+            self.predicty1cr = self.net1cr(self.x1cr, is_training=True)
+            self.proby1cr = tf.nn.softmax(self.predicty1cr)
 
         if (self.config_test.get('whole_tumor_only', False) is False):
             # 2.2, networks for tumor core
@@ -264,14 +267,11 @@ class Brats17(TOMAATService):
 
         # 3, create session and load trained models
         all_vars = tf.global_variables()
-
-        #config = tf.ConfigProto()
-        #config.gpu_options.allow_growth = True
-        #sess = tf.Session(config=config)
-
-        sess = tf.InteractiveSession()
-
+        config = tf.ConfigProto()
+        config.gpu_options.allow_growth = True
+        sess = tf.Session(config=config)
         sess.run(tf.global_variables_initializer())
+
         if (self.config_net1):
             net1_vars = [x for x in all_vars if x.name[0:len(net_name1) + 1] == net_name1 + '/']
             saver1 = tf.train.Saver(net1_vars)
@@ -380,8 +380,7 @@ class Brats17(TOMAATService):
         margin = self.config_test.get('roi_patch_margin', 5)
 
         for i in range(image_num):
-            [temp_imgs, temp_weight, temp_name, img_names, temp_bbox, temp_size] = dataloader.get_image_data_with_name(
-                i)
+            [temp_imgs, temp_weight, temp_name, img_names, temp_bbox, temp_size] = dataloader.get_image_data_with_name(i)
             t0 = time.time()
             # 5.1, test of 1st network
             if (self.config_net1):
@@ -565,7 +564,7 @@ def start_prediction_service(port, api_key):
     }
 
     service = Brats17(
-        './config17/test_all_class.txt',
+        './config15/test_all_class.txt',
         params=params,
         data_read_pipeline=dummy_data_pipeline,
         data_write_pipeline=dummy_data_pipeline,
