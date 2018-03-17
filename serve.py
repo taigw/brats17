@@ -266,7 +266,7 @@ class Brats17(TOMAATService):
 
         # 3, create session and load trained models
         self.all_vars = tf.global_variables()
-        self.sess = tf.InteractiveSession()
+        self.sess = tf.InteractiveSession(graph=tf.Graph())
         self.sess.run(tf.global_variables_initializer())
 
         if (self.config_net1):
