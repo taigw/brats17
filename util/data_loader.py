@@ -289,6 +289,7 @@ class DataLoaderServing(DataLoader):
         Y = []
         bbox = []
         in_size = []
+        patient_names = []
 
         volume_list = []
         volume_name_list = []
@@ -308,6 +309,10 @@ class DataLoaderServing(DataLoader):
             volume_list.append(volume)
             volume_name_list.append(volume_name)
 
+            _, b = os.split(file)
+
+            patient_names.append(b)
+
         ImageNames.append(volume_name_list)
         X.append(volume_list)
         W.append(weight)
@@ -320,4 +325,5 @@ class DataLoaderServing(DataLoader):
         self.label = Y
         self.bbox = bbox
         self.in_size = in_size
+        self.patient_names = patient_names
 
