@@ -386,7 +386,6 @@ class Brats17(TOMAATService):
         margin = self.config_test.get('roi_patch_margin', 5)
 
         for i in range(image_num):
-            print('HELLO')
             [temp_imgs, temp_weight, temp_name, img_names, temp_bbox, temp_size] = \
                 dataloader.get_image_data_with_name(i)
 
@@ -409,8 +408,6 @@ class Brats17(TOMAATService):
             prob1 = test_one_image_three_nets_adaptive_shape(temp_imgs, data_shapes, label_shapes, self.data_shape1ax[-1],
                                                              class_num,
                                                              self.batch_size, self.sess, nets, outputs, inputs, shape_mode=2)
-
-            print('PORCODIO')
 
             pred1 = np.asarray(np.argmax(prob1, axis=3), np.uint16)
             pred1 = pred1 * temp_weight
@@ -532,7 +529,7 @@ class Brats17(TOMAATService):
             final_label = np.zeros(temp_size, np.int16)
             final_label = set_ND_volume_roi_with_bounding_box_range(final_label, temp_bbox[0], temp_bbox[1], out_label)
 
-            temp_name = save_folder + "/{0:}_seg.mha".format(img_names[0])
+            temp_name = os.path.join(save_folder, "{0:}_seg.mha".format(str(uuid.uuid4())))
 
             save_array_as_nifty_volume(final_label, temp_name, img_names[0])
 
