@@ -376,8 +376,9 @@ class Brats17(TOMAATService):
         margin = self.config_test.get('roi_patch_margin', 5)
 
         for i in range(image_num):
-            [temp_imgs, temp_weight, temp_name, img_names, temp_bbox, temp_size] = dataloader.get_image_data_with_name(
-                i)
+            [temp_imgs, temp_weight, temp_name, img_names, temp_bbox, temp_size] = \
+                dataloader.get_image_data_with_name(i)
+
             t0 = time.time()
             # 5.1, test of 1st network
             if (self.config_net1):

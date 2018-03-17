@@ -403,7 +403,7 @@ class ResBlock(TrainableLayer):
                                 w_regularizer=self.regularizers['w'],
                                 name='conv_{}'.format(i))
             # connect layers
-            output_tensor = bn_op(output_tensor, is_training)
+            #output_tensor = bn_op(output_tensor, is_training)
             output_tensor = acti_op(output_tensor)
             output_tensor = conv_op(output_tensor)
         # make residual connections
