@@ -295,7 +295,7 @@ class DataLoaderServing(DataLoader):
         volume_list = []
         volume_name_list = []
         for i, file in enumerate(file_list):
-            volume, volume_name = self.__load_one_volume(self.patient_names[i], self.modality_postfix[mod_idx])
+            volume, volume_name = self.__load_one_volume(file)
             if 'flair' in file:
                 margin = 5
                 bbmin, bbmax = get_ND_bounding_box(volume, margin)
