@@ -277,15 +277,15 @@ class Brats17(TOMAATService):
             self.saver1 = tf.train.Saver(self.net1_vars)
             self.saver1.restore(sess, self.config_net1['model_file'])
         else:
-            self.net1ax_vars = [x for x in all_vars if x.name[0:len(net_name1ax) + 1] == net_name1ax + '/']
+            self.net1ax_vars = [x for x in self.all_vars if x.name[0:len(net_name1ax) + 1] == net_name1ax + '/']
             self.saver1ax = tf.train.Saver(self.net1ax_vars)
-            self.saver1ax.restore(sess, config_net1ax['model_file'])
-            self.net1sg_vars = [x for x in all_vars if x.name[0:len(net_name1sg) + 1] == net_name1sg + '/']
+            self.saver1ax.restore(self.sess, config_net1ax['model_file'])
+            self.net1sg_vars = [x for x in self.all_vars if x.name[0:len(net_name1sg) + 1] == net_name1sg + '/']
             self.saver1sg = tf.train.Saver(self.net1sg_vars)
-            self.saver1sg.restore(sess, config_net1sg['model_file'])
-            self.net1cr_vars = [x for x in all_vars if x.name[0:len(net_name1cr) + 1] == net_name1cr + '/']
+            self.saver1sg.restore(self.sess, config_net1sg['model_file'])
+            self.net1cr_vars = [x for x in self.all_vars if x.name[0:len(net_name1cr) + 1] == net_name1cr + '/']
             self.saver1cr = tf.train.Saver(self.net1cr_vars)
-            self.saver1cr.restore(sess, config_net1cr['model_file'])
+            self.saver1cr.restore(self.sess, config_net1cr['model_file'])
 
         if (self.config_test.get('whole_tumor_only', False) is False):
             if (self.config_net2):
