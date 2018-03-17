@@ -268,7 +268,7 @@ class Brats17(TOMAATService):
         config = tf.ConfigProto()
         config.gpu_options.allow_growth = True
         sess = tf.Session(config=config)
-        
+
         sess.run(tf.global_variables_initializer())
         if (self.config_net1):
             net1_vars = [x for x in all_vars if x.name[0:len(net_name1) + 1] == net_name1 + '/']
@@ -345,7 +345,7 @@ class Brats17(TOMAATService):
         with open(tmp_filename_flair, 'wb') as f:
             f.write(request.args['Flair'][0])
 
-        with open(tmp_filename_t1, 't1') as f:
+        with open(tmp_filename_t1, 'wb') as f:
             f.write(request.args['T1'][0])
 
         with open(tmp_filename_t1ce, 'wb') as f:
