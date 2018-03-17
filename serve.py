@@ -380,7 +380,7 @@ class Brats17(TOMAATService):
 
         # 5, start to test
         test_slice_direction = self.config_test.get('test_slice_direction', 'all')
-        save_folder = self.config_data['save_folder']
+        save_folder = tempfile.gettempdir()
         test_time = []
         struct = ndimage.generate_binary_structure(3, 2)
         margin = self.config_test.get('roi_patch_margin', 5)
