@@ -63,7 +63,7 @@ class Brats17(TOMAATService):
             full_data_shape1 = [self.batch_size] + self.data_shape1
             self.x1 = tf.placeholder(tf.float32, shape=full_data_shape1)
             net_class1 = NetFactory.create(net_type1)
-            net1 = net_class1(num_classes=self.class_num1, w_regularizer=None,
+            self.net1 = net_class1(num_classes=self.class_num1, w_regularizer=None,
                               b_regularizer=None, name=net_name1)
             self.net1.set_params(self.config_net1)
             predicty1 = self.net1(self.x1, is_training=True)
@@ -270,7 +270,7 @@ class Brats17(TOMAATService):
         #sess = tf.Session(config=config)
 
         sess = tf.InteractiveSession()
-        
+
         sess.run(tf.global_variables_initializer())
         if (self.config_net1):
             net1_vars = [x for x in all_vars if x.name[0:len(net_name1) + 1] == net_name1 + '/']
