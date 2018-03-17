@@ -571,7 +571,7 @@ def start_prediction_service(port, api_key):
     }
 
     service = Brats17(
-        './config15/test_all_class.txt',
+        './config17/test_all_class.txt',
         params=params,
         data_read_pipeline=dummy_data_pipeline,
         data_write_pipeline=dummy_data_pipeline,
