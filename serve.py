@@ -51,7 +51,7 @@ class Brats17(TOMAATService):
         self.config_net2 = self.config.get('network2', None)
         self.config_net3 = self.config.get('network3', None)
         self.config_test = self.config['testing']
-        self.batch_size = 5
+        self.batch_size = self.config_test.get('batch_size', 5)
 
         # 2.1, network for whole tumor
         if (self.config_net1):
@@ -379,8 +379,6 @@ class Brats17(TOMAATService):
         for i in range(image_num):
             [temp_imgs, temp_weight, temp_name, img_names, temp_bbox, temp_size] = dataloader.get_image_data_with_name(i)
 
-            print(temp_imgs)
-            print(temp_imgs.shape)
             t0 = time.time()
             # 5.1, test of 1st network
             if (self.config_net1):
@@ -397,6 +395,7 @@ class Brats17(TOMAATService):
                 outputs = [self.proby1ax, self.proby1sg, self.proby1cr]
                 inputs = [self.x1ax, self.x1sg, self.x1cr]
                 class_num = self.class_num1ax
+
             prob1 = test_one_image_three_nets_adaptive_shape(temp_imgs, data_shapes, label_shapes, self.data_shape1ax[-1],
                                                              class_num,
                                                              self.batch_size, self.sess, nets, outputs, inputs, shape_mode=2)
