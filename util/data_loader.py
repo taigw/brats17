@@ -71,7 +71,7 @@ class DataLoader():
         # for brats15
         else:
             img_file_dirs = os.listdir(patient_dir)
-            volume_name  = None
+            volume_name = None
             for img_file_dir in img_file_dirs:
                 if(mod+'.' in img_file_dir):
                     volume_name = img_file_dir + '/' + img_file_dir + '.' + self.file_postfix
@@ -272,3 +272,54 @@ class DataLoader():
         Used for testing, get one image data and patient name
         """
         return [self.data[i], self.weight[i], self.patient_names[i], self.image_names[i], self.bbox[i], self.in_size[i]]
+
+
+class DataLoaderServing(DataLoader):
+    def __load_one_volume(self, file):
+        volume = load_3d_volume_as_array(file)
+        return volume, file
+
+    def load_data(self, file_list):
+        """
+               load testing data
+        """
+        ImageNames = []
+        X = []
+        W = []
+        Y = []
+        bbox = []
+        in_size = []
+
+        mods = ['flair.', 't1.', 't1ce.', 't2.']
+
+        volume_list = []
+        volume_name_list = []
+        for i, file in enumerate(file_list):
+            volume, volume_name = self.__load_one_volume(self.patient_names[i], self.modality_postfix[mod_idx])
+            if 'flair' in file:
+                margin = 5
+                bbmin, bbmax = get_ND_bounding_box(volume, margin)
+                volume_size = volume.shape
+            volume = crop_ND_volume_with_bounding_box(volume, bbmin, bbmax)
+            if (self.data_resize):
+                volume = resize_3D_volume_to_given_shape(volume, self.data_resize, 1)
+            if 'flair' in file:
+                weight = np.asarray(volume > 0, np.float32)
+            if (self.intensity_normalize[mods[i]]):
+                volume = itensity_normalize_one_volume(volume)
+            volume_list.append(volume)
+            volume_name_list.append(volume_name)
+
+        ImageNames.append(volume_name_list)
+        X.append(volume_list)
+        W.append(weight)
+        bbox.append([bbmin, bbmax])
+        in_size.append(volume_size)
+
+        self.image_names = ImageNames
+        self.data = X
+        self.weight = W
+        self.label = Y
+        self.bbox = bbox
+        self.in_size = in_size
+

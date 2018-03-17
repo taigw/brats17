@@ -8,6 +8,7 @@
 # Distributed under the BSD-3 licence. Please see the file licence.txt
 # This software is not certified for clinical use.
 #
+
 from __future__ import absolute_import, print_function
 import numpy as np
 from scipy import ndimage
@@ -347,7 +348,7 @@ def test(config_file):
             sub_weight = crop_ND_volume_with_bounding_box(temp_weight, bbox1[0], bbox1[1])
 
             if(config_net2):
-                data_shapes  = [ data_shape2[:-1],  data_shape2[:-1],  data_shape2[:-1]]
+                data_shapes  = [data_shape2[:-1],  data_shape2[:-1],  data_shape2[:-1]]
                 label_shapes = [label_shape2[:-1], label_shape2[:-1], label_shape2[:-1]]
                 nets = [net2, net2, net2]
                 outputs = [proby2, proby2, proby2]
