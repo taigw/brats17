@@ -269,14 +269,13 @@ class Brats17(TOMAATService):
         self.sess = tf.InteractiveSession()
         self.sess.run(tf.global_variables_initializer())
 
-        print(self.all_vars)
-        
         if (self.config_net1):
             self.net1_vars = [x for x in self.all_vars if x.name[0:len(self.net_name1) + 1] == self.net_name1 + '/']
             self.saver1 = tf.train.Saver(self.net1_vars)
             self.saver1.restore(self.sess, self.config_net1['model_file'])
         else:
             self.net1ax_vars = [x for x in self.all_vars if x.name[0:len(self.net_name1ax) + 1] == self.net_name1ax + '/']
+            print(self.net1ax_vars)
             self.saver1ax = tf.train.Saver(self.net1ax_vars)
             self.saver1ax.restore(self.sess, self.config_net1ax['model_file'])
             self.net1sg_vars = [x for x in self.all_vars if x.name[0:len(self.net_name1sg) + 1] == self.net_name1sg + '/']
