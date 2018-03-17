@@ -266,9 +266,11 @@ class Brats17(TOMAATService):
 
         # 3, create session and load trained models
         self.all_vars = tf.global_variables()
-        self.sess = tf.InteractiveSession(graph=tf.Graph())
+        self.sess = tf.InteractiveSession()
         self.sess.run(tf.global_variables_initializer())
 
+        print(self.all_vars)
+        
         if (self.config_net1):
             self.net1_vars = [x for x in self.all_vars if x.name[0:len(self.net_name1) + 1] == self.net_name1 + '/']
             self.saver1 = tf.train.Saver(self.net1_vars)
