@@ -42,6 +42,8 @@ class Brats17(TOMAATService):
 
     def __init__(self, config_file, **kwargs):
 
+        super(Brats17, self).__init__(**kwargs)
+
         # 1, load configure file
         self.config = parse_config(config_file)
         self.config_data = self.config['data']
@@ -273,9 +275,9 @@ class Brats17(TOMAATService):
         self.sess.run(tf.global_variables_initializer())
 
         if (self.config_net1):
-            self.net1_vars = [x for x in all_vars if x.name[0:len(net_name1) + 1] == net_name1 + '/']
+            self.net1_vars = [x for x in self.all_vars if x.name[0:len(net_name1) + 1] == net_name1 + '/']
             self.saver1 = tf.train.Saver(self.net1_vars)
-            self.saver1.restore(sess, self.config_net1['model_file'])
+            self.saver1.restore(self.sess, self.config_net1['model_file'])
         else:
             self.net1ax_vars = [x for x in self.all_vars if x.name[0:len(net_name1ax) + 1] == net_name1ax + '/']
             self.saver1ax = tf.train.Saver(self.net1ax_vars)
@@ -317,8 +319,6 @@ class Brats17(TOMAATService):
                 self.net3cr_vars = [x for x in self.all_vars if x.name[0:len(net_name3cr) + 1] == net_name3cr + '/']
                 self.saver3cr = tf.train.Saver(self.net3cr_vars)
                 self.saver3cr.restore(self.sess, config_net3cr['model_file'])
-
-        super(Brats17, self).__init__(**kwargs)
 
     def parse_request(self, request):
         savepath = tempfile.gettempdir()
