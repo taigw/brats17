@@ -556,7 +556,7 @@ class Brats17(TOMAATService):
 
 @click.command()
 @click.option('--api_key', default='')
-@click.option('--port', default=9000)
+@click.option('--port', default=9002)
 def start_prediction_service(port, api_key):
     params = {
         'port': port,
@@ -577,7 +577,7 @@ def start_prediction_service(port, api_key):
         data_write_pipeline=dummy_data_pipeline,
         image_field='images',
         segmentation_field='label',
-        port=9002,
+        port=port,
     )
 
     if api_key is not '':
