@@ -1,3 +1,5 @@
+from __future__ import absolute_import, print_function
+
 import tensorflow as tf
 import numpy as np
 import click
@@ -11,7 +13,7 @@ import uuid
 import os
 
 from ..core.service import TOMAATService
-from __future__ import absolute_import, print_function
+
 import numpy as np
 from scipy import ndimage
 import time
