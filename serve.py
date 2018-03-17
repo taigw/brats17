@@ -374,13 +374,9 @@ class Brats17(TOMAATService):
 
     def do_inference(self, data):
 
-        dataloader = DataLoader(self.config_data)
-        dataloader.load_data()
+        dataloader = DataLoaderServing(self.config_data)
+        dataloader.load_data([data['flair'], data['t1'], data['t1c'], data['t2']])
         image_num = dataloader.get_total_image_number()
-
-        #dataloader = DataLoaderServing(self.config_data)
-        #dataloader.load_data([data['flair'], data['t1'], data['t1c'], data['t2']])
-        #image_num = dataloader.get_total_image_number()
 
         # 5, start to test
         test_slice_direction = self.config_test.get('test_slice_direction', 'all')
