@@ -55,270 +55,265 @@ class Brats17(TOMAATService):
 
         # 2.1, network for whole tumor
         if (self.config_net1):
-            net_type1 = self.config_net1['net_type']
-            net_name1 = self.config_net1['net_name']
+            self.net_type1 = self.config_net1['net_type']
+            self.net_name1 = self.config_net1['net_name']
             self.data_shape1 = self.config_net1['data_shape']
             self.label_shape1 = self.config_net1['label_shape']
             self.class_num1 = self.config_net1['class_num']
 
             # construct graph for 1st network
-            full_data_shape1 = [self.batch_size] + self.data_shape1
-            self.x1 = tf.placeholder(tf.float32, shape=full_data_shape1)
-            net_class1 = NetFactory.create(net_type1)
-            self.net1 = net_class1(num_classes=self.class_num1, w_regularizer=None,
-                              b_regularizer=None, name=net_name1)
+            self.full_data_shape1 = [self.batch_size] + self.data_shape1
+            self.x1 = tf.placeholder(tf.float32, shape=self.full_data_shape1)
+            self.net_class1 = NetFactory.create(self.net_type1)
+            self.net1 = self.net_class1(num_classes=self.class_num1, w_regularizer=None,
+                              b_regularizer=None, name=self.net_name1)
             self.net1.set_params(self.config_net1)
-            predicty1 = self.net1(self.x1, is_training=True)
-            self.proby1 = tf.nn.softmax(predicty1)
+            self.predicty1 = self.net1(self.x1, is_training=True)
+            self.proby1 = tf.nn.softmax(self.predicty1)
         else:
-            config_net1ax = self.config['network1ax']
-            config_net1sg = self.config['network1sg']
-            config_net1cr = self.config['network1cr']
+            self.config_net1ax = self.config['network1ax']
+            self.config_net1sg = self.config['network1sg']
+            self.config_net1cr = self.config['network1cr']
 
             # construct graph for 1st network axial
-            net_type1ax = config_net1ax['net_type']
-            net_name1ax = config_net1ax['net_name']
-            self.data_shape1ax = config_net1ax['data_shape']
-            self.label_shape1ax = config_net1ax['label_shape']
-            self.class_num1ax = config_net1ax['class_num']
+            self.net_type1ax = self.config_net1ax['net_type']
+            self.net_name1ax = self.config_net1ax['net_name']
+            self.data_shape1ax = self.config_net1ax['data_shape']
+            self.label_shape1ax = self.config_net1ax['label_shape']
+            self.class_num1ax = self.config_net1ax['class_num']
 
-            full_data_shape1ax = [self.batch_size] + self.data_shape1ax
-            self.x1ax = tf.placeholder(tf.float32, shape=full_data_shape1ax)
-
-            self.net_class1ax = NetFactory.create(net_type1ax)
-            self.net1ax = self.net_class1ax(num_classes=self.class_num1ax, w_regularizer=None, b_regularizer=None, name=net_name1ax)
-
-            self.net1ax.set_params(config_net1ax)
+            self.full_data_shape1ax = [self.batch_size] + self.data_shape1ax
+            self.x1ax = tf.placeholder(tf.float32, shape=self.full_data_shape1ax)
+            self.net_class1ax = NetFactory.create(self.net_type1ax)
+            self.net1ax = self.net_class1ax(num_classes=self.class_num1ax, w_regularizer=None,
+                                  b_regularizer=None, name=self.net_name1ax)
+            self.net1ax.set_params(self.config_net1ax)
             self.predicty1ax = self.net1ax(self.x1ax, is_training=True)
             self.proby1ax = tf.nn.softmax(self.predicty1ax)
 
             # construct graph for 1st network sagittal
-            net_type1sg = config_net1sg['net_type']
-            net_name1sg = config_net1sg['net_name']
-            self.data_shape1sg = config_net1sg['data_shape']
-            self.label_shape1sg = config_net1sg['label_shape']
-            class_num1sg = config_net1sg['class_num']
+            self.net_type1sg = self.config_net1sg['net_type']
+            self.net_name1sg = self.config_net1sg['net_name']
+            self.data_shape1sg = self.config_net1sg['data_shape']
+            self.label_shape1sg = self.config_net1sg['label_shape']
+            self.class_num1sg = self.config_net1sg['class_num']
 
-            full_data_shape1sg = [self.batch_size] + self.data_shape1sg
-            self.x1sg = tf.placeholder(tf.float32, shape=full_data_shape1sg)
-
-            self.net_class1sg = NetFactory.create(net_type1sg)
-            self.net1sg = self.net_class1sg(num_classes=class_num1sg, w_regularizer=None, b_regularizer=None, name=net_name1sg)
-
-            self.net1sg.set_params(config_net1sg)
+            self.full_data_shape1sg = [self.batch_size] + self.data_shape1sg
+            self.x1sg = tf.placeholder(tf.float32, shape=self.full_data_shape1sg)
+            self.net_class1sg = NetFactory.create(self.net_type1sg)
+            self.net1sg = self.net_class1sg(num_classes=self.class_num1sg, w_regularizer=None,
+                                  b_regularizer=None, name=self.net_name1sg)
+            self.net1sg.set_params(self.config_net1sg)
             self.predicty1sg = self.net1sg(self.x1sg, is_training=True)
             self.proby1sg = tf.nn.softmax(self.predicty1sg)
 
             # construct graph for 1st network corogal
-            net_type1cr = config_net1cr['net_type']
-            net_name1cr = config_net1cr['net_name']
-            self.data_shape1cr = config_net1cr['data_shape']
-            self.label_shape1cr = config_net1cr['label_shape']
-            class_num1cr = config_net1cr['class_num']
+            self.net_type1cr = self.config_net1cr['net_type']
+            self.net_name1cr = self.config_net1cr['net_name']
+            self.data_shape1cr = self.config_net1cr['data_shape']
+            self.label_shape1cr = self.config_net1cr['label_shape']
+            self.class_num1cr = self.config_net1cr['class_num']
 
-            full_data_shape1cr = [self.batch_size] + self.data_shape1cr
-            self.x1cr = tf.placeholder(tf.float32, shape=full_data_shape1cr)
-
-            self.net_class1cr = NetFactory.create(net_type1cr)
-            self.net1cr = self.net_class1cr(num_classes=class_num1cr, w_regularizer=None, b_regularizer=None, name=net_name1cr)
-
-            self.net1cr.set_params(config_net1cr)
+            self.full_data_shape1cr = [self.batch_size] + self.data_shape1cr
+            self.x1cr = tf.placeholder(tf.float32, shape=self.full_data_shape1cr)
+            self.net_class1cr = NetFactory.create(self.net_type1cr)
+            self.net1cr = self.net_class1cr(num_classes=self.class_num1cr, w_regularizer=None,
+                                  b_regularizer=None, name=self.net_name1cr)
+            self.net1cr.set_params(self.config_net1cr)
             self.predicty1cr = self.net1cr(self.x1cr, is_training=True)
             self.proby1cr = tf.nn.softmax(self.predicty1cr)
 
         if (self.config_test.get('whole_tumor_only', False) is False):
             # 2.2, networks for tumor core
             if (self.config_net2):
-                net_type2 = self.config_net2['net_type']
-                net_name2 = self.config_net2['net_name']
+                self.net_type2 = self.config_net2['net_type']
+                self.net_name2 = self.config_net2['net_name']
                 self.data_shape2 = self.config_net2['data_shape']
                 self.label_shape2 = self.config_net2['label_shape']
                 self.class_num2 = self.config_net2['class_num']
 
                 # construct graph for 2st network
-                full_data_shape2 = [self.batch_size] + self.data_shape2
-                self.x2 = tf.placeholder(tf.float32, shape=full_data_shape2)
-                net_class2 = NetFactory.create(net_type2)
-                self.net2 = net_class2(num_classes=self.class_num2, w_regularizer=None,
-                                  b_regularizer=None, name=net_name2)
+                self.full_data_shape2 = [self.batch_size] + self.data_shape2
+                self.x2 = tf.placeholder(tf.float32, shape=self.full_data_shape2)
+                self.net_class2 = NetFactory.create(self.net_type2)
+                self.net2 = self.net_class2(num_classes=self.class_num2, w_regularizer=None,
+                                  b_regularizer=None, name=self.net_name2)
                 self.net2.set_params(self.config_net2)
-                predicty2 = self.net2(self.x2, is_training=True)
-                self.proby2 = tf.nn.softmax(predicty2)
+                self.predicty2 = self.net2(self.x2, is_training=True)
+                self.proby2 = tf.nn.softmax(self.predicty2)
             else:
-                config_net2ax = self.config['network2ax']
-                config_net2sg = self.config['network2sg']
-                config_net2cr = self.config['network2cr']
+                self.config_net2ax = self.config['network2ax']
+                self.config_net2sg = self.config['network2sg']
+                self.config_net2cr = self.config['network2cr']
 
                 # construct graph for 2st network axial
-                net_type2ax = config_net2ax['net_type']
-                net_name2ax = config_net2ax['net_name']
-                self.data_shape2ax = config_net2ax['data_shape']
-                self.label_shape2ax = config_net2ax['label_shape']
-                self.class_num2ax = config_net2ax['class_num']
+                self.net_type2ax = self.config_net2ax['net_type']
+                self.net_name2ax = self.config_net2ax['net_name']
+                self.data_shape2ax = self.config_net2ax['data_shape']
+                self.label_shape2ax = self.config_net2ax['label_shape']
+                self.class_num2ax = self.config_net2ax['class_num']
 
-                full_data_shape2ax = [self.batch_size] + self.data_shape2ax
-                self.x2ax = tf.placeholder(tf.float32, shape=full_data_shape2ax)
-                net_class2ax = NetFactory.create(net_type2ax)
-                self.net2ax = net_class2ax(num_classes=self.class_num2ax, w_regularizer=None,
-                                      b_regularizer=None, name=net_name2ax)
-                self.net2ax.set_params(config_net2ax)
-                predicty2ax = self.net2ax(self.x2ax, is_training=True)
-                self.proby2ax = tf.nn.softmax(predicty2ax)
+                self.full_data_shape2ax = [self.batch_size] + self.data_shape2ax
+                self.x2ax = tf.placeholder(tf.float32, shape=self.full_data_shape2ax)
+                self.net_class2ax = NetFactory.create(self.net_type2ax)
+                self.net2ax = self.net_class2ax(num_classes=self.class_num2ax, w_regularizer=None,
+                                      b_regularizer=None, name=self.net_name2ax)
+                self.net2ax.set_params(self.config_net2ax)
+                self.predicty2ax = self.net2ax(self.x2ax, is_training=True)
+                self.proby2ax = tf.nn.softmax(self.predicty2ax)
 
                 # construct graph for 2st network sagittal
-                net_type2sg = config_net2sg['net_type']
-                net_name2sg = config_net2sg['net_name']
-                self.data_shape2sg = config_net2sg['data_shape']
-                self.label_shape2sg = config_net2sg['label_shape']
-                class_num2sg = config_net2sg['class_num']
+                self.net_type2sg = self.config_net2sg['net_type']
+                self.net_name2sg = self.config_net2sg['net_name']
+                self.data_shape2sg = self.config_net2sg['data_shape']
+                self.label_shape2sg = self.config_net2sg['label_shape']
+                self.class_num2sg = self.config_net2sg['class_num']
 
-                full_data_shape2sg = [self.batch_size] + self.data_shape2sg
-                self.x2sg = tf.placeholder(tf.float32, shape=full_data_shape2sg)
-                net_class2sg = NetFactory.create(net_type2sg)
-                self.net2sg = net_class2sg(num_classes=class_num2sg, w_regularizer=None,
-                                      b_regularizer=None, name=net_name2sg)
-                self.net2sg.set_params(config_net2sg)
-                predicty2sg = self.net2sg(self.x2sg, is_training=True)
-                self.proby2sg = tf.nn.softmax(predicty2sg)
+                self.full_data_shape2sg = [self.batch_size] + self.data_shape2sg
+                self.x2sg = tf.placeholder(tf.float32, shape=self.full_data_shape2sg)
+                self.net_class2sg = NetFactory.create(self.net_type2sg)
+                self.net2sg = self.net_class2sg(num_classes=self.class_num2sg, w_regularizer=None,
+                                      b_regularizer=None, name=self.net_name2sg)
+                self.net2sg.set_params(self.config_net2sg)
+                self.predicty2sg = self.net2sg(self.x2sg, is_training=True)
+                self.proby2sg = tf.nn.softmax(self.predicty2sg)
 
                 # construct graph for 2st network corogal
-                net_type2cr = config_net2cr['net_type']
-                net_name2cr = config_net2cr['net_name']
-                self.data_shape2cr = config_net2cr['data_shape']
-                self.label_shape2cr = config_net2cr['label_shape']
-                class_num2cr = config_net2cr['class_num']
+                self.net_type2cr = self.config_net2cr['net_type']
+                self.net_name2cr = self.config_net2cr['net_name']
+                self.data_shape2cr = self.config_net2cr['data_shape']
+                self.label_shape2cr = self.config_net2cr['label_shape']
+                self.class_num2cr = self.config_net2cr['class_num']
 
-                full_data_shape2cr = [self.batch_size] + self.data_shape2cr
-                self.x2cr = tf.placeholder(tf.float32, shape=full_data_shape2cr)
-                net_class2cr = NetFactory.create(net_type2cr)
-                self.net2cr = net_class2cr(num_classes=class_num2cr, w_regularizer=None,
-                                      b_regularizer=None, name=net_name2cr)
-                self.net2cr.set_params(config_net2cr)
-                predicty2cr = self.net2cr(self.x2cr, is_training=True)
-                self.proby2cr = tf.nn.softmax(predicty2cr)
+                self.full_data_shape2cr = [self.batch_size] + self.data_shape2cr
+                self.x2cr = tf.placeholder(tf.float32, shape=self.full_data_shape2cr)
+                self.net_class2cr = NetFactory.create(self.net_type2cr)
+                self.net2cr = self.net_class2cr(num_classes=self.class_num2cr, w_regularizer=None,
+                                      b_regularizer=None, name=self.net_name2cr)
+                self.net2cr.set_params(self.config_net2cr)
+                self.predicty2cr = self.net2cr(self.x2cr, is_training=True)
+                self.proby2cr = tf.nn.softmax(self.predicty2cr)
 
             # 2.3, networks for enhanced tumor
             if (self.config_net3):
-                net_type3 = self.config_net3['net_type']
-                net_name3 = self.config_net3['net_name']
+                self.net_type3 = self.config_net3['net_type']
+                self.net_name3 = self.config_net3['net_name']
                 self.data_shape3 = self.config_net3['data_shape']
                 self.label_shape3 = self.config_net3['label_shape']
                 self.class_num3 = self.config_net3['class_num']
 
                 # construct graph for 3st network
-                full_data_shape3 = [self.batch_size] + self.data_shape3
-                self.x3 = tf.placeholder(tf.float32, shape=full_data_shape3)
-                net_class3 = NetFactory.create(net_type3)
-                self.net3 = net_class3(num_classes=self.class_num3, w_regularizer=None,
-                                  b_regularizer=None, name=net_name3)
+                self.full_data_shape3 = [self.batch_size] + self.data_shape3
+                self.x3 = tf.placeholder(tf.float32, shape=self.full_data_shape3)
+                self.net_class3 = NetFactory.create(self.net_type3)
+                self.net3 = self.net_class3(num_classes=self.class_num3, w_regularizer=None,
+                                  b_regularizer=None, name=self.net_name3)
                 self.net3.set_params(self.config_net3)
-                predicty3 = self.net3(self.x3, is_training=True)
-                self.proby3 = tf.nn.softmax(predicty3)
+                self.predicty3 = self.net3(self.x3, is_training=True)
+                self.proby3 = tf.nn.softmax(self.predicty3)
             else:
-                config_net3ax = self.config['network3ax']
-                config_net3sg = self.config['network3sg']
-                config_net3cr = self.config['network3cr']
+                self.config_net3ax = self.config['network3ax']
+                self.config_net3sg = self.config['network3sg']
+                self.config_net3cr = self.config['network3cr']
 
                 # construct graph for 3st network axial
-                net_type3ax = config_net3ax['net_type']
-                net_name3ax = config_net3ax['net_name']
-                self.data_shape3ax = config_net3ax['data_shape']
-                self.label_shape3ax = config_net3ax['label_shape']
-                self.class_num3ax = config_net3ax['class_num']
+                self.net_type3ax = self.config_net3ax['net_type']
+                self.net_name3ax = self.config_net3ax['net_name']
+                self.data_shape3ax = self.config_net3ax['data_shape']
+                self.label_shape3ax = self.config_net3ax['label_shape']
+                self.class_num3ax = self.config_net3ax['class_num']
 
-                full_data_shape3ax = [self.batch_size] + self.data_shape3ax
-                self.x3ax = tf.placeholder(tf.float32, shape=full_data_shape3ax)
-                net_class3ax = NetFactory.create(net_type3ax)
-                self.net3ax = net_class3ax(num_classes=self.class_num3ax, w_regularizer=None,
-                                      b_regularizer=None, name=net_name3ax)
-                self.net3ax.set_params(config_net3ax)
-                predicty3ax = self.net3ax(self.x3ax, is_training=True)
-                self.proby3ax = tf.nn.softmax(predicty3ax)
+                self.full_data_shape3ax = [self.batch_size] + self.data_shape3ax
+                self.x3ax = tf.placeholder(tf.float32, shape=self.full_data_shape3ax)
+                self.net_class3ax = NetFactory.create(self.net_type3ax)
+                self.net3ax = self.net_class3ax(num_classes=self.class_num3ax, w_regularizer=None,
+                                      b_regularizer=None, name=self.net_name3ax)
+                self.net3ax.set_params(self.config_net3ax)
+                self.predicty3ax = self.net3ax(self.x3ax, is_training=True)
+                self.proby3ax = tf.nn.softmax(self.predicty3ax)
 
                 # construct graph for 3st network sagittal
-                net_type3sg = config_net3sg['net_type']
-                net_name3sg = config_net3sg['net_name']
-                self.data_shape3sg = config_net3sg['data_shape']
-                self.label_shape3sg = config_net3sg['label_shape']
-                class_num3sg = config_net3sg['class_num']
+                self.net_type3sg = self.config_net3sg['net_type']
+                self.net_name3sg = self.config_net3sg['net_name']
+                self.data_shape3sg = self.config_net3sg['data_shape']
+                self.label_shape3sg = self.config_net3sg['label_shape']
+                self.class_num3sg = self.config_net3sg['class_num']
                 # construct graph for 3st network
-                full_data_shape3sg = [self.batch_size] + self.data_shape3sg
-                self.x3sg = tf.placeholder(tf.float32, shape=full_data_shape3sg)
-                net_class3sg = NetFactory.create(net_type3sg)
-                self.net3sg = net_class3sg(num_classes=class_num3sg, w_regularizer=None,
-                                      b_regularizer=None, name=net_name3sg)
-                self.net3sg.set_params(config_net3sg)
-                predicty3sg = self.net3sg(self.x3sg, is_training=True)
-                self.proby3sg = tf.nn.softmax(predicty3sg)
+                self.full_data_shape3sg = [self.batch_size] + self.data_shape3sg
+                self.x3sg = tf.placeholder(tf.float32, shape=self.full_data_shape3sg)
+                self.net_class3sg = NetFactory.create(self.net_type3sg)
+                self.net3sg = self.net_class3sg(num_classes=self.class_num3sg, w_regularizer=None,
+                                      b_regularizer=None, name=self.net_name3sg)
+                self.net3sg.set_params(self.config_net3sg)
+                self.predicty3sg = self.net3sg(self.x3sg, is_training=True)
+                self.proby3sg = tf.nn.softmax(self.predicty3sg)
 
                 # construct graph for 3st network corogal
-                net_type3cr = config_net3cr['net_type']
-                net_name3cr = config_net3cr['net_name']
-                self.data_shape3cr = config_net3cr['data_shape']
-                self.label_shape3cr = config_net3cr['label_shape']
-                class_num3cr = config_net3cr['class_num']
+                self.net_type3cr = self.config_net3cr['net_type']
+                self.net_name3cr = self.config_net3cr['net_name']
+                self.data_shape3cr = self.config_net3cr['data_shape']
+                self.label_shape3cr = self.config_net3cr['label_shape']
+                self.class_num3cr = self.config_net3cr['class_num']
                 # construct graph for 3st network
-                full_data_shape3cr = [self.batch_size] + self.data_shape3cr
-                self.x3cr = tf.placeholder(tf.float32, shape=full_data_shape3cr)
-                net_class3cr = NetFactory.create(net_type3cr)
-                self.net3cr = net_class3cr(num_classes=class_num3cr, w_regularizer=None,
-                                      b_regularizer=None, name=net_name3cr)
-                self.net3cr.set_params(config_net3cr)
-                predicty3cr = self.net3cr(self.x3cr, is_training=True)
-                self.proby3cr = tf.nn.softmax(predicty3cr)
+                self.full_data_shape3cr = [self.batch_size] + self.data_shape3cr
+                self.x3cr = tf.placeholder(tf.float32, shape=self.full_data_shape3cr)
+                self.net_class3cr = NetFactory.create(self.net_type3cr)
+                self.net3cr = self.net_class3cr(num_classes=self.class_num3cr, w_regularizer=None,
+                                      b_regularizer=None, name=self.net_name3cr)
+                self.net3cr.set_params(self.config_net3cr)
+                self.predicty3cr = self.net3cr(self.x3cr, is_training=True)
+                self.proby3cr = tf.nn.softmax(self.predicty3cr)
 
         # 3, create session and load trained models
         self.all_vars = tf.global_variables()
-        config = tf.ConfigProto()
-        config.gpu_options.allow_growth = True
-        self.sess = tf.Session(config=config)
+        self.sess = tf.InteractiveSession()
         self.sess.run(tf.global_variables_initializer())
 
         if (self.config_net1):
-            self.net1_vars = [x for x in self.all_vars if x.name[0:len(net_name1) + 1] == net_name1 + '/']
+            self.net1_vars = [x for x in self.all_vars if x.name[0:len(self.net_name1) + 1] == self.net_name1 + '/']
             self.saver1 = tf.train.Saver(self.net1_vars)
             self.saver1.restore(self.sess, self.config_net1['model_file'])
         else:
-            self.net1ax_vars = [x for x in self.all_vars if x.name[0:len(net_name1ax) + 1] == net_name1ax + '/']
+            self.net1ax_vars = [x for x in self.all_vars if x.name[0:len(self.net_name1ax) + 1] == self.net_name1ax + '/']
             self.saver1ax = tf.train.Saver(self.net1ax_vars)
-            self.saver1ax.restore(self.sess, config_net1ax['model_file'])
-            self.net1sg_vars = [x for x in self.all_vars if x.name[0:len(net_name1sg) + 1] == net_name1sg + '/']
+            self.saver1ax.restore(self.sess, self.config_net1ax['model_file'])
+            self.net1sg_vars = [x for x in self.all_vars if x.name[0:len(self.net_name1sg) + 1] == self.net_name1sg + '/']
             self.saver1sg = tf.train.Saver(self.net1sg_vars)
-            self.saver1sg.restore(self.sess, config_net1sg['model_file'])
-            self.net1cr_vars = [x for x in self.all_vars if x.name[0:len(net_name1cr) + 1] == net_name1cr + '/']
+            self.saver1sg.restore(self.sess, self.config_net1sg['model_file'])
+            self.net1cr_vars = [x for x in self.all_vars if x.name[0:len(self.net_name1cr) + 1] == self.net_name1cr + '/']
             self.saver1cr = tf.train.Saver(self.net1cr_vars)
-            self.saver1cr.restore(self.sess, config_net1cr['model_file'])
+            self.saver1cr.restore(self.sess, self.config_net1cr['model_file'])
 
         if (self.config_test.get('whole_tumor_only', False) is False):
             if (self.config_net2):
-                self.net2_vars = [x for x in self.all_vars if x.name[0:len(net_name2) + 1] == net_name2 + '/']
+                self.net2_vars = [x for x in self.all_vars if x.name[0:len(self.net_name2) + 1] == self.net_name2 + '/']
                 self.saver2 = tf.train.Saver(self.net2_vars)
                 self.saver2.restore(self.sess, self.config_net2['model_file'])
             else:
-                self.net2ax_vars = [x for x in self.all_vars if x.name[0:len(net_name2ax) + 1] == net_name2ax + '/']
+                self.net2ax_vars = [x for x in self.all_vars if x.name[0:len(self.net_name2ax) + 1] == self.net_name2ax + '/']
                 self.saver2ax = tf.train.Saver(self.net2ax_vars)
-                self.saver2ax.restore(self.sess, config_net2ax['model_file'])
-                self.net2sg_vars = [x for x in self.all_vars if x.name[0:len(net_name2sg) + 1] == net_name2sg + '/']
+                self.saver2ax.restore(self.sess, self.config_net2ax['model_file'])
+                self.net2sg_vars = [x for x in self.all_vars if x.name[0:len(self.net_name2sg) + 1] == self.net_name2sg + '/']
                 self.saver2sg = tf.train.Saver(self.net2sg_vars)
-                self.saver2sg.restore(self.sess, config_net2sg['model_file'])
-                self.net2cr_vars = [x for x in self.all_vars if x.name[0:len(net_name2cr) + 1] == net_name2cr + '/']
+                self.saver2sg.restore(self.sess, self.config_net2sg['model_file'])
+                self.net2cr_vars = [x for x in self.all_vars if x.name[0:len(self.net_name2cr) + 1] == self.net_name2cr + '/']
                 self.saver2cr = tf.train.Saver(self.net2cr_vars)
-                self.saver2cr.restore(self.sess, config_net2cr['model_file'])
+                self.saver2cr.restore(self.sess, self.config_net2cr['model_file'])
 
             if (self.config_net3):
-                self.net3_vars = [x for x in self.all_vars if x.name[0:len(net_name3) + 1] == net_name3 + '/']
+                self.net3_vars = [x for x in self.all_vars if x.name[0:len(self.net_name3) + 1] == self.net_name3 + '/']
                 self.saver3 = tf.train.Saver(self.net3_vars)
                 self.saver3.restore(self.sess, self.config_net3['model_file'])
             else:
-                self.net3ax_vars = [x for x in self.all_vars if x.name[0:len(net_name3ax) + 1] == net_name3ax + '/']
+                self.net3ax_vars = [x for x in self.all_vars if x.name[0:len(self.net_name3ax) + 1] == self.net_name3ax + '/']
                 self.saver3ax = tf.train.Saver(self.net3ax_vars)
-                self.saver3ax.restore(self.sess, config_net3ax['model_file'])
-                self.net3sg_vars = [x for x in self.all_vars if x.name[0:len(net_name3sg) + 1] == net_name3sg + '/']
+                self.saver3ax.restore(self.sess, self.config_net3ax['model_file'])
+                self.net3sg_vars = [x for x in self.all_vars if x.name[0:len(self.net_name3sg) + 1] == self.net_name3sg + '/']
                 self.saver3sg = tf.train.Saver(self.net3sg_vars)
-                self.saver3sg.restore(self.sess, config_net3sg['model_file'])
-                self.net3cr_vars = [x for x in self.all_vars if x.name[0:len(net_name3cr) + 1] == net_name3cr + '/']
+                self.saver3sg.restore(self.sess, self.config_net3sg['model_file'])
+                self.net3cr_vars = [x for x in self.all_vars if x.name[0:len(self.net_name3cr) + 1] == self.net_name3cr + '/']
                 self.saver3cr = tf.train.Saver(self.net3cr_vars)
-                self.saver3cr.restore(self.sess, config_net3cr['model_file'])
+                self.saver3cr.restore(self.sess, self.config_net3cr['model_file'])
 
     def parse_request(self, request):
         savepath = tempfile.gettempdir()
@@ -375,14 +370,14 @@ class Brats17(TOMAATService):
 
         # 5, start to test
         test_slice_direction = self.config_test.get('test_slice_direction', 'all')
-        save_folder = tempfile.gettempdir()
+        save_folder = self.config_data['save_folder']
         test_time = []
         struct = ndimage.generate_binary_structure(3, 2)
         margin = self.config_test.get('roi_patch_margin', 5)
 
         for i in range(image_num):
-            [temp_imgs, temp_weight, temp_name, img_names, temp_bbox, temp_size] = dataloader.get_image_data_with_name(i)
-
+            [temp_imgs, temp_weight, temp_name, img_names, temp_bbox, temp_size] = dataloader.get_image_data_with_name(
+                i)
             t0 = time.time()
             # 5.1, test of 1st network
             if (self.config_net1):
@@ -399,7 +394,6 @@ class Brats17(TOMAATService):
                 outputs = [self.proby1ax, self.proby1sg, self.proby1cr]
                 inputs = [self.x1ax, self.x1sg, self.x1cr]
                 class_num = self.class_num1ax
-
             prob1 = test_one_image_three_nets_adaptive_shape(temp_imgs, data_shapes, label_shapes, self.data_shape1ax[-1],
                                                              class_num,
                                                              self.batch_size, self.sess, nets, outputs, inputs, shape_mode=2)
@@ -499,15 +493,12 @@ class Brats17(TOMAATService):
                 label2_3_mask = label2_3_mask * label1_mask
                 label2_3_mask = ndimage.morphology.binary_closing(label2_3_mask, structure=struct)
                 label2_3_mask = remove_external_core(label1, label2_3_mask)
-
                 if (label2_3_mask.sum() > 0):
                     label2_3_mask = get_largest_two_component(label2_3_mask)
-
                 label1 = (label1 + label2_3_mask) > 0
                 label2 = label2_3_mask
                 label3 = label2 * label3
                 vox_3 = np.asarray(label3 > 0, np.float32).sum()
-
                 if (0 < vox_3 and vox_3 < 30):
                     label3 = np.zeros_like(label2)
 
