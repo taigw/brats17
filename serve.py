@@ -355,11 +355,11 @@ class Brats17(TOMAATService):
             f.write(request.args['T2'][0])
 
         data = {
-            'flair': [tmp_filename_flair],
-            't1': [tmp_filename_t1],
-            't1ce': [tmp_filename_t1ce],
-            't2': [tmp_filename_t2],
-            'uids': [uid],
+            'flair': tmp_filename_flair,
+            't1': tmp_filename_t1,
+            't1ce': tmp_filename_t1ce,
+            't2': tmp_filename_t2,
+            'uids': uid,
         }
 
         return data
