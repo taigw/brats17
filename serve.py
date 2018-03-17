@@ -77,7 +77,7 @@ class Brats17(TOMAATService):
             net_type1ax = config_net1ax['net_type']
             net_name1ax = config_net1ax['net_name']
             self.data_shape1ax = config_net1ax['data_shape']
-            self.self.label_shape1ax = config_net1ax['label_shape']
+            self.label_shape1ax = config_net1ax['label_shape']
             self.class_num1ax = config_net1ax['class_num']
 
             full_data_shape1ax = [self.batch_size] + self.data_shape1ax
@@ -93,7 +93,7 @@ class Brats17(TOMAATService):
             net_type1sg = config_net1sg['net_type']
             net_name1sg = config_net1sg['net_name']
             self.data_shape1sg = config_net1sg['data_shape']
-            self.self.label_shape1sg = config_net1sg['label_shape']
+            self.label_shape1sg = config_net1sg['label_shape']
             class_num1sg = config_net1sg['class_num']
 
             full_data_shape1sg = [self.batch_size] + self.data_shape1sg
