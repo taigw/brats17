@@ -1,28 +1,14 @@
 from __future__ import absolute_import, print_function
-
-import tensorflow as tf
-import numpy as np
 import click
-import time
-import SimpleITK as sitk
 import base64
-import vtk
 
 import tempfile
 import uuid
-import os
 
-from ..core.service import TOMAATService
-
-import numpy as np
-from scipy import ndimage
+from tomaat.core.service import TOMAATService
 import time
-import os
-import sys
 import tensorflow as tf
-from tensorflow.contrib.data import Iterator
 from util.data_loader import *
-from util.data_process import *
 from util.train_test_func import *
 from util.parse_config import parse_config
 from train import NetFactory
@@ -382,7 +368,7 @@ class Brats17(TOMAATService):
 
         # 5, start to test
         test_slice_direction = self.config_test.get('test_slice_direction', 'all')
-        savepath = tempfile.gettempdir()
+        save_folder = tempfile.gettempdir()
         test_time = []
         struct = ndimage.generate_binary_structure(3, 2)
         margin = self.config_test.get('roi_patch_margin', 5)
@@ -444,7 +430,7 @@ class Brats17(TOMAATService):
                     inputs = [self.x2ax, self.x2sg, self.x2cr]
                     class_num = self.class_num2ax
                 prob2 = test_one_image_three_nets_adaptive_shape(sub_imgs, data_shapes, label_shapes, self.data_shape2ax[-1],
-                                                                 class_num, self.batch_size, sess, nets, outputs, inputs,
+                                                                 class_num, self.batch_size, self.sess, nets, outputs, inputs,
                                                                  shape_mode=1)
                 pred2 = np.asarray(np.argmax(prob2, axis=3), np.uint16)
                 pred2 = pred2 * sub_weight
@@ -480,7 +466,7 @@ class Brats17(TOMAATService):
 
                 prob3 = test_one_image_three_nets_adaptive_shape(subsub_imgs, data_shapes, label_shapes,
                                                                  self.data_shape3ax[-1],
-                                                                 class_num, self.batch_size, sess, nets, outputs, inputs,
+                                                                 class_num, self.batch_size, self.sess, nets, outputs, inputs,
                                                                  shape_mode=1)
 
                 pred3 = np.asarray(np.argmax(prob3, axis=3), np.uint16)
