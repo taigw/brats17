@@ -273,50 +273,50 @@ class Brats17(TOMAATService):
         sess.run(tf.global_variables_initializer())
 
         if (self.config_net1):
-            net1_vars = [x for x in all_vars if x.name[0:len(net_name1) + 1] == net_name1 + '/']
-            saver1 = tf.train.Saver(net1_vars)
-            saver1.restore(sess, self.config_net1['model_file'])
+            self.net1_vars = [x for x in all_vars if x.name[0:len(net_name1) + 1] == net_name1 + '/']
+            self.saver1 = tf.train.Saver(self.net1_vars)
+            self.saver1.restore(sess, self.config_net1['model_file'])
         else:
-            net1ax_vars = [x for x in all_vars if x.name[0:len(net_name1ax) + 1] == net_name1ax + '/']
-            saver1ax = tf.train.Saver(net1ax_vars)
-            saver1ax.restore(sess, config_net1ax['model_file'])
-            net1sg_vars = [x for x in all_vars if x.name[0:len(net_name1sg) + 1] == net_name1sg + '/']
-            saver1sg = tf.train.Saver(net1sg_vars)
-            saver1sg.restore(sess, config_net1sg['model_file'])
-            net1cr_vars = [x for x in all_vars if x.name[0:len(net_name1cr) + 1] == net_name1cr + '/']
-            saver1cr = tf.train.Saver(net1cr_vars)
-            saver1cr.restore(sess, config_net1cr['model_file'])
+            self.net1ax_vars = [x for x in all_vars if x.name[0:len(net_name1ax) + 1] == net_name1ax + '/']
+            self.saver1ax = tf.train.Saver(self.net1ax_vars)
+            self.saver1ax.restore(sess, config_net1ax['model_file'])
+            self.net1sg_vars = [x for x in all_vars if x.name[0:len(net_name1sg) + 1] == net_name1sg + '/']
+            self.saver1sg = tf.train.Saver(self.net1sg_vars)
+            self.saver1sg.restore(sess, config_net1sg['model_file'])
+            self.net1cr_vars = [x for x in all_vars if x.name[0:len(net_name1cr) + 1] == net_name1cr + '/']
+            self.saver1cr = tf.train.Saver(self.net1cr_vars)
+            self.saver1cr.restore(sess, config_net1cr['model_file'])
 
         if (self.config_test.get('whole_tumor_only', False) is False):
             if (self.config_net2):
-                net2_vars = [x for x in all_vars if x.name[0:len(net_name2) + 1] == net_name2 + '/']
-                saver2 = tf.train.Saver(net2_vars)
-                saver2.restore(sess, self.config_net2['model_file'])
+                self.net2_vars = [x for x in all_vars if x.name[0:len(net_name2) + 1] == net_name2 + '/']
+                self.saver2 = tf.train.Saver(self.net2_vars)
+                self.saver2.restore(sess, self.config_net2['model_file'])
             else:
-                net2ax_vars = [x for x in all_vars if x.name[0:len(net_name2ax) + 1] == net_name2ax + '/']
-                saver2ax = tf.train.Saver(net2ax_vars)
-                saver2ax.restore(sess, config_net2ax['model_file'])
-                net2sg_vars = [x for x in all_vars if x.name[0:len(net_name2sg) + 1] == net_name2sg + '/']
-                saver2sg = tf.train.Saver(net2sg_vars)
-                saver2sg.restore(sess, config_net2sg['model_file'])
-                net2cr_vars = [x for x in all_vars if x.name[0:len(net_name2cr) + 1] == net_name2cr + '/']
-                saver2cr = tf.train.Saver(net2cr_vars)
-                saver2cr.restore(sess, config_net2cr['model_file'])
+                self.net2ax_vars = [x for x in all_vars if x.name[0:len(net_name2ax) + 1] == net_name2ax + '/']
+                self.saver2ax = tf.train.Saver(self.net2ax_vars)
+                self.saver2ax.restore(sess, config_net2ax['model_file'])
+                self.net2sg_vars = [x for x in all_vars if x.name[0:len(net_name2sg) + 1] == net_name2sg + '/']
+                self.saver2sg = tf.train.Saver(self.net2sg_vars)
+                self.saver2sg.restore(sess, config_net2sg['model_file'])
+                self.net2cr_vars = [x for x in all_vars if x.name[0:len(net_name2cr) + 1] == net_name2cr + '/']
+                self.saver2cr = tf.train.Saver(self.net2cr_vars)
+                self.saver2cr.restore(sess, config_net2cr['model_file'])
 
             if (self.config_net3):
-                net3_vars = [x for x in all_vars if x.name[0:len(net_name3) + 1] == net_name3 + '/']
-                saver3 = tf.train.Saver(net3_vars)
-                saver3.restore(sess, self.config_net3['model_file'])
+                self.net3_vars = [x for x in all_vars if x.name[0:len(net_name3) + 1] == net_name3 + '/']
+                self.saver3 = tf.train.Saver(self.net3_vars)
+                self.saver3.restore(sess, self.config_net3['model_file'])
             else:
-                net3ax_vars = [x for x in all_vars if x.name[0:len(net_name3ax) + 1] == net_name3ax + '/']
-                saver3ax = tf.train.Saver(net3ax_vars)
-                saver3ax.restore(sess, config_net3ax['model_file'])
-                net3sg_vars = [x for x in all_vars if x.name[0:len(net_name3sg) + 1] == net_name3sg + '/']
-                saver3sg = tf.train.Saver(net3sg_vars)
-                saver3sg.restore(sess, config_net3sg['model_file'])
-                net3cr_vars = [x for x in all_vars if x.name[0:len(net_name3cr) + 1] == net_name3cr + '/']
-                saver3cr = tf.train.Saver(net3cr_vars)
-                saver3cr.restore(sess, config_net3cr['model_file'])
+                self.net3ax_vars = [x for x in all_vars if x.name[0:len(net_name3ax) + 1] == net_name3ax + '/']
+                self.saver3ax = tf.train.Saver(self.net3ax_vars)
+                self.saver3ax.restore(sess, config_net3ax['model_file'])
+                self.net3sg_vars = [x for x in all_vars if x.name[0:len(net_name3sg) + 1] == net_name3sg + '/']
+                self.saver3sg = tf.train.Saver(self.net3sg_vars)
+                self.saver3sg.restore(sess, config_net3sg['model_file'])
+                self.net3cr_vars = [x for x in all_vars if x.name[0:len(net_name3cr) + 1] == net_name3cr + '/']
+                self.saver3cr = tf.train.Saver(self.net3cr_vars)
+                self.saver3cr.restore(sess, config_net3cr['model_file'])
 
 
         self.sess = sess
