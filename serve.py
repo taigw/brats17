@@ -49,7 +49,7 @@ class Brats17(TOMAATService):
         self.config_net2 = self.config.get('network2', None)
         self.config_net3 = self.config.get('network3', None)
         self.config_test = self.config['testing']
-        self.batch_size = 32
+        self.batch_size = 5
 
         # 2.1, network for whole tumor
         if (self.config_net1):
