@@ -264,7 +264,11 @@ class Brats17(TOMAATService):
 
         # 3, create session and load trained models
         all_vars = tf.global_variables()
-        sess = tf.InteractiveSession()
+
+        config = tf.ConfigProto()
+        config.gpu_options.allow_growth = True
+        sess = tf.Session(config=config)
+        
         sess.run(tf.global_variables_initializer())
         if (self.config_net1):
             net1_vars = [x for x in all_vars if x.name[0:len(net_name1) + 1] == net_name1 + '/']
