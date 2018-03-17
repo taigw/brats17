@@ -290,8 +290,6 @@ class DataLoaderServing(DataLoader):
         bbox = []
         in_size = []
 
-        mods = ['flair.', 't1.', 't1ce.', 't2.']
-
         volume_list = []
         volume_name_list = []
         for i, file in enumerate(file_list):
@@ -305,7 +303,7 @@ class DataLoaderServing(DataLoader):
                 volume = resize_3D_volume_to_given_shape(volume, self.data_resize, 1)
             if 'flair' in file:
                 weight = np.asarray(volume > 0, np.float32)
-            if (self.intensity_normalize[mods[i]]):
+            if (self.intensity_normalize[i]):
                 volume = itensity_normalize_one_volume(volume)
             volume_list.append(volume)
             volume_name_list.append(volume_name)
