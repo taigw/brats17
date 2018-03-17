@@ -309,7 +309,7 @@ class DataLoaderServing(DataLoader):
             volume_list.append(volume)
             volume_name_list.append(volume_name)
 
-            _, b = os.split(file)
+            _, b = os.path.split(file)
 
             patient_names.append(b)
 
