@@ -118,7 +118,7 @@ class DataLoader():
             bbox.append([bbmin, bbmax])
             in_size.append(volume_size)
             if(self.with_ground_truth):
-                label = self.__load_one_volume(self.patient_names[i], self.label_postfix)
+                label, _ = self.__load_one_volume(self.patient_names[i], self.label_postfix)
                 label = crop_ND_volume_with_bounding_box(label, bbmin, bbmax)
                 if(self.data_resize):
                     label = resize_3D_volume_to_given_shape(label, self.data_resize, 0)
