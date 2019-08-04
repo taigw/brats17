@@ -16,12 +16,9 @@ An example of brain tumor segmentation result.
 # Requirements
 * A CUDA compatable GPU with memoery not less than 6GB is recommended for training. For testing only, a CUDA compatable GPU may not be required.
 
-* Tensorflow. Install tensorflow following instructions from https://www.tensorflow.org/install/
+* Tensorflow (v1.4.0). Install tensorflow following instructions from https://www.tensorflow.org/install/
 
-* NiftyNet. Install it by following instructions from http://niftynet.readthedocs.io/en/dev/installation.html or simply typing:
-```bash
-pip install niftynet
-```
+* NiftyNet (v0.2.0). Install it by following instructions from http://niftynet.readthedocs.io/en/dev/installation.html 
 
 * BraTS 2015 or 2017 dataset. Data can be downloaded from http://braintumorsegmentation.org/
 
