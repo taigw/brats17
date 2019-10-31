@@ -8,6 +8,7 @@
 # Distributed under the BSD-3 licence. Please see the file licence.txt
 # This software is not certified for clinical use.
 #
+
 from __future__ import absolute_import, print_function
 import numpy as np
 from scipy import ndimage
@@ -101,7 +102,6 @@ def test(config_file):
         net1cr.set_params(config_net1cr)
         predicty1cr = net1cr(x1cr, is_training = True)
         proby1cr = tf.nn.softmax(predicty1cr)
-    
     
     if(config_test.get('whole_tumor_only', False) is False):
         # 2.2, networks for tumor core
@@ -247,7 +247,8 @@ def test(config_file):
     # 3, create session and load trained models
     all_vars = tf.global_variables()
     sess = tf.InteractiveSession()   
-    sess.run(tf.global_variables_initializer())  
+    sess.run(tf.global_variables_initializer())
+
     if(config_net1):
         net1_vars = [x for x in all_vars if x.name[0:len(net_name1) + 1]==net_name1 + '/']
         saver1 = tf.train.Saver(net1_vars)
@@ -295,6 +296,7 @@ def test(config_file):
             saver3cr.restore(sess, config_net3cr['model_file'])     
 
     # 4, load test images
+
     dataloader = DataLoader(config_data)
     dataloader.load_data()
     image_num = dataloader.get_total_image_number()
@@ -347,7 +349,7 @@ def test(config_file):
             sub_weight = crop_ND_volume_with_bounding_box(temp_weight, bbox1[0], bbox1[1])
 
             if(config_net2):
-                data_shapes  = [ data_shape2[:-1],  data_shape2[:-1],  data_shape2[:-1]]
+                data_shapes  = [data_shape2[:-1],  data_shape2[:-1],  data_shape2[:-1]]
                 label_shapes = [label_shape2[:-1], label_shape2[:-1], label_shape2[:-1]]
                 nets = [net2, net2, net2]
                 outputs = [proby2, proby2, proby2]
